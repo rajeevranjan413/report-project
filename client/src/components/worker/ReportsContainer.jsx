@@ -95,7 +95,7 @@ const ReportContainer = () => {
 
     return (
         <>
-            {allReports?.length <= 0 && <div className='px-2 mt-3 h-[200px] w-full bg-white grid place-items-center'>No Updates</div>}
+            {allReports?.length <= 0 && <div className={`px-2 mt-3 h-[200px] w-full bg-white grid place-items-center`}>No Updates</div>}
             {allReports?.length > 0 &&
                 allReports?.map((ele, index) => {
                     return (

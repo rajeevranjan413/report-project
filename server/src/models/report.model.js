@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const reportSchema = new mongoose.Schema({
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "Worker"
+    },
     area: {
         type: String,
         enum: ['Area 1', 'Area 2', 'Area 3', 'Area 4'],

@@ -7,9 +7,9 @@ app.get("/", (req, res) => {
 
 
 
-import workerRouter from "./routes/worker.route.js"
+import reportRouter from "./routes/report.route.js"
 
-app.use("/worker", workerRouter)
+app.use("/report", reportRouter)
 
 
 

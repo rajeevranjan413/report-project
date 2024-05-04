@@ -95,10 +95,10 @@ const ReportCard = ({ reportData }) => {
 
     return (
 
-        <div className=' px-2 mt-3 mb-9 w-full border bg-white rounded'>
+        <div className={` px-2 mt-3 mb-9 w-full border bg-white rounded`}>
 
 
-            <div className='text-sm w-full grid grid-cols-3  md:grid-cols-5 lg:grid-cols-9 items-center lg:gap-1 gap-2 py-5'>
+            <div className={`text-sm w-full grid grid-cols-3  md:grid-cols-5 lg:grid-cols-9 items-center lg:gap-1 gap-2 py-5`}>
                 {
                     newReport?.map((ele, index) =>
                         <ReportData setComplain={setComplain} key={index} name={ele?.name} label={ele?.label} type={ele?.type} options={ele?.options} isDisplay={ele?.isDisplay} complain={complain} />
