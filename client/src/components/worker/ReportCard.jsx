@@ -8,74 +8,29 @@ import { ReportContext } from '../../context/ReportContext';
 
 
 
+
+
 const ReportCard = ({ reportData }) => {
-    const [edit, setEdit] = useState(true)
+
+    const reports = reportData.report
+    const [newReport, setNewReport] = useState(reports)
+    const [disabled, setDisabled] = useState(false)
     const [complain, setComplain] = useState(false)
-    const [newReport, setNewReport] = useState(reportData.report)
+
+
 
     const { allReports, setAllReports } = useContext(ReportContext)
 
+    // console.log(reports)
 
 
-
-
-    useEffect(() => {
-        if (complain) {
-
-            setNewReport(newReport.map((report) => {
-                const condition = ['premise', "chemical", "tempature", "rating", "test"]
-                if (condition.includes(report.name)) {
-                    return {
-                        ...report,
-                        isDisplay: false
-                    }
-                }
-                if (report.name == "problem") {
-                    return {
-                        ...report,
-                        isDisplay: true
-                    }
-                }
-
-                else {
-                    return report
-                }
-
-            }))
-
-        }
-        else {
-
-            setNewReport(newReport.map((report) => {
-                const condition = ['premise', "chemical", "tempature", "rating", "test"]
-                if (condition.includes(report.name)) {
-                    return {
-                        ...report,
-                        isDisplay: true
-                    }
-                }
-                if (report.name == "problem") {
-                    return {
-                        ...report,
-                        isDisplay: false
-                    }
-                }
-
-                else {
-                    return report
-                }
-
-            }))
-        }
-    }, [complain])
-
-    console.log("New Report State", newReport)
+    // console.log("New Report State", newReport)
     const handleEdit = () => {
-        setEdit(false)
+        setDisabled(false)
     }
     const handleSave = () => {
         // console.log('saved', setReport)
-        setEdit(true)
+        setDisabled(true)
         setAllReports((prev) => prev.map((ele) => {
             if (ele.id === newReport.id) {
                 return {
@@ -89,9 +44,11 @@ const ReportCard = ({ reportData }) => {
     }
 
     const handleDelete = () => {
+
         let indexToDelete = allReports.findIndex(obj => obj.id === newReport.id);
         setAllReports(allReports.splice(indexToDelete, 1))
     }
+    console.log(newReport)
 
     return (
 
@@ -100,16 +57,24 @@ const ReportCard = ({ reportData }) => {
 
             <div className={`text-sm w-full grid grid-cols-3  md:grid-cols-5 lg:grid-cols-9 items-center lg:gap-1 gap-2 py-5`}>
                 {
-                    newReport?.map((ele, index) =>
-                        <ReportData setComplain={setComplain} key={index} name={ele?.name} label={ele?.label} type={ele?.type} options={ele?.options} isDisplay={ele?.isDisplay} complain={complain} />
+                    disabled && reports?.map((ele, index) =>
+                        <ReportData disabled={disabled} setComplain={setComplain} key={index} name={ele?.name} label={ele?.label} type={ele?.type} options={ele?.options} isDisplay={ele?.isDisplay} complain={complain} setNewReport={setNewReport} />
                     )
                 }
+
+                {
+                    !disabled && newReport?.map((ele, index) =>
+                        <ReportData disabled={disabled} setComplain={setComplain} key={index} name={ele?.name} label={ele?.label} type={ele?.type} options={ele?.options} isDisplay={ele?.isDisplay} complain={complain} setNewReport={setNewReport} />
+                    )
+                }
+
+
 
 
             </div>
 
             <div className=' flex justify-center gap-3  mb-3'>
-                {edit ? <button className='flex items-center gap-1' onClick={handleEdit}><FaRegEdit />Edit</button> : <button className='flex items-center gap-1' onClick={handleSave}><CiSaveUp2 />Save</button>}
+                {disabled ? <button className='flex items-center gap-1' onClick={handleEdit}><FaRegEdit />Edit</button> : <button className='flex items-center gap-1' onClick={handleSave}><CiSaveUp2 />Save</button>}
                 <button onClick={handleDelete} className='flex items-center gap-1'><RiDeleteBinLine />Delete</button>
             </div>
         </div>

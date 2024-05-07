@@ -16,73 +16,56 @@ const ReportContainer = () => {
                 {
                     name: "area",
                     label: "Area",
-                    isDisplay: "true",
                     type: "select",
                     options: ["Area 1", "Area 2", "Area 3", "Area 4"]
                 },
                 {
                     name: "topic",
                     label: "Topic",
-                    isDisplay: "true",
                     type: "select",
-                    options: ["Before Work", "After Work", "Complain"]
+                    options: ["Before Work", "Chemical Applied", "After Work", "Complain"]
                 },
 
                 {
                     name: "chemical",
                     label: "Chemical Used",
-                    isDisplay: "true",
                     type: "select",
                     options: ["Acid", "Alkaline", "Water"]
                 },
                 {
                     name: "premise",
                     label: "Prepared Premise",
-                    isDisplay: "true",
                     isSelect: "false",
                     type: "text",
                 },
                 {
                     name: "tempature",
                     label: "Water Tempature",
-                    isDisplay: "true",
                     isSelect: "false",
                     type: "text",
                 },
                 {
                     name: "rating",
                     label: "Job Rating",
-                    isDisplay: "true",
                     type: "select",
                     options: [20, 30, 40, 50, 60, 70, 80, 90, 100]
                 },
                 {
                     name: "test",
                     label: "ATP Result",
-                    isDisplay: "true",
                     type: "text"
-                },
-                {
-                    name: "problem",
-                    label: "Problem Type",
-                    isDisplay: "false",
-                    type: "select",
-                    options: ["Water", "Hose", "Covering Up", "Another"]
                 },
                 {
                     name: "comment",
                     label: "Comment",
-                    isDisplay: "true",
                     type: "text",
                 },
                 {
                     name: "photo",
                     label: "Add Photos",
-                    isDisplay: "true",
                     type: "file",
 
                 },
-
 
             ]
         }
