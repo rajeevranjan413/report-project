@@ -114,4 +114,5 @@ module.exports = {
   getEmployeeList,
   getManagerList,
   deleteUserCtrl,
+  getClientList,
 };
