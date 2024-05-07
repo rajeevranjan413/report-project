@@ -17,9 +17,10 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const user = await User.create({
       name: req?.body?.name,
+      factoryName: req?.body?.factoryName,
       email: req?.body?.email,
       password: req?.body?.password,
-      isEmployee: req?.body?.isEmployee,
+      role: req?.body?.role,
     });
     res.json(user);
   } catch (error) {
@@ -41,9 +42,7 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
       _id: userFound?._id,
       name: userFound?.name,
       email: userFound?.email,
-      profilePhoto: userFound?.profilePhoto,
-      isEmployee: userFound?.isEmployee,
-      isAdmin: userFound?.isAdmin,
+      role: userFound?.role,
       token: generateToken(userFound._id),
     });
   } else {
@@ -58,7 +57,7 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 
 const getEmployeeList = expressAsyncHandler(async (req, res) => {
   //check if user exists
-  const userFound = await User.find({ isEmployee: true });
+  const userFound = await User.find({ role: "Worker" });
   //Check if password is match
   if (userFound) {
     res.json(userFound);
@@ -73,9 +72,22 @@ const getEmployeeList = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const getManagerList = expressAsyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  //check if user exists
-  const userFound = await User.find({ isEmployee: false });
+  const userFound = await User.find({ role: "Manager" });
+  //Check if password is match
+  if (userFound) {
+    res.json(userFound);
+  } else {
+    res.status(401);
+    throw new Error("Invalid Credentials");
+  }
+});
+
+//-------------------------------
+//Client List
+//-------------------------------
+
+const getClientList = expressAsyncHandler(async (req, res) => {
+  const userFound = await User.find({ role: "Client" });
   //Check if password is match
   if (userFound) {
     res.json(userFound);
