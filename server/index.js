@@ -11,14 +11,14 @@ const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(cookieParser());
+app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
   res.send("hello")
 })
 app.use("/api/users", userRoutes);
-app.use("/api/reports", userRoutes);
+app.use("/api/reports", reportRoutes);
 //app.use("/api/photos", photoRoutes);
 //app.use("/api/comments", commentRoutes);
 

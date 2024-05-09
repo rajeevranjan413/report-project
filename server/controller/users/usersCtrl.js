@@ -1,6 +1,6 @@
 const expressAsyncHandler = require("express-async-handler");
 const User = require("../../model/User/User");
-const generateToken = require("../../config/generateToken");
+// const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
 const cloudinaryUploadImg = require("../../utils/cloudinary");
 const fs = require("fs");
@@ -38,22 +38,34 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { name, password } = req.body;
+  const { email, password } = req.body;
+  // if (!username && !email) {
+  //   return res.json({ message: "username or email is required" })
+  // }
   //check if user exists
-  const userFound = await User.findOne({ name });
-  //Check if password is match
-  if (userFound && (await userFound.isPasswordMatched(password))) {
-    return res.json({
-      _id: userFound?._id,
-      name: userFound?.name,
-      email: userFound?.email,
-      role: userFound?.role,
-      token: generateToken(userFound._id),
-    });
-  } else {
-    return res.json({ message: "Invalid Credentials" }).status(401);
+  const userFound = await User.findOne({ email });
 
+  if (!userFound) {
+    return res.json({ message: "user not found" })
   }
+
+  const isPasswordValid = await userFound.isPasswordMatched(password)
+
+  if (!isPasswordValid) {
+    return res.json({ message: "Invalid Credentials" })
+  }
+
+  const accessToken = userFound.generateAccessToken(userFound._id, userFound.name, userFound.role)
+
+  const options = {
+    httpOnly: true,
+    secure: true
+  }
+
+  res.cookie('accessToken', options).json({ message: "User logedIn !", data: userFound })
+
+
+
 });
 
 //-------------------------------

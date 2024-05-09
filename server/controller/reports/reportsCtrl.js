@@ -9,27 +9,64 @@ const fs = require("fs");
 // create User
 //-----------------------------------------
 const addReportCtrl = expressAsyncHandler(async (req, res) => {
-    //Checking user alredy exist
-    const report = req?.body?.report;
+    const createdBy = req.user.name
+    const { report } = req.body
+    const files = req.files
+    const photosUrls = []
+    for (const file of files) {
+        const { path } = file;
+        const url = await cloudinaryUploadImg(path);
+
+        photosUrls.push(url)
+    }
+    console.log(photosUrls)
 
     try {
-        const report = await Report.create({
-            createdBy: report.workerName,
+        const addedReport = await Report.create({
+            createdBy: report.createdBy,
             area: report.area,
             topic: report.topic,
+            problem: report.problem,
             chemical: report.chemical,
-            premise: report.premise,
+            premise: report.premis,
             tempature: report.tempature,
             rating: report.rating,
             test: report.test,
             comment: report.comment,
-            file: report.file,
+            photo: photosUrls
+        })
+        return res.json({ message: `Report added Successfully`, data: addedReport });
 
-        });
-        res.json(user);
-    } catch (error) {
-        res.json(error);
     }
+    catch (err) {
+        return res.json({ message: "Something went wrong while adding the report", data: err })
+    }
+
+
+
+    //Checking user alredy exist
+    // const filesData = req.file
+    // console.log("Files Data", filesData)
+    // const report = req?.body?.report;
+
+    // try {
+    //     const report = await Report.create({
+    //         createdBy: report.workerName,
+    //         area: report.area,
+    //         topic: report.topic,
+    //         chemical: report.chemical,
+    //         premise: report.premise,
+    //         tempature: report.tempature,
+    //         rating: report.rating,
+    //         test: report.test,
+    //         comment: report.comment,
+    //         file: report.file,
+
+    //     });
+    //     res.json(user);
+    // } catch (error) {
+    //     res.json(error);
+    // }
 });
 
 //-------------------------------

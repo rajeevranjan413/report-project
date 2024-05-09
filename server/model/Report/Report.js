@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
 const reportSchema = new mongoose.Schema(
   {
     createdBy: {
