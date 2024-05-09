@@ -16,6 +16,10 @@ const reportSchema = new mongoose.Schema(
       enum: ["Before Work", "After Work", "Complain"],
       required: true,
     },
+    problem: {
+      type: String,
+      enum: ["Water", "Hose", "Covering Up", "Another"],
+    },
 
     chemical: {
       type: String,
@@ -34,10 +38,7 @@ const reportSchema = new mongoose.Schema(
     test: {
       type: String,
     },
-    problem: {
-      type: String,
-      enum: ["Water", "Hose", "Covering Up", "Another"],
-    },
+
     comment: {
       type: String,
     },
@@ -46,4 +47,6 @@ const reportSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Report = mongoose.model("Report", reportSchema);
+const Report = mongoose.model("Report", reportSchema);
+
+module.exports = Report;

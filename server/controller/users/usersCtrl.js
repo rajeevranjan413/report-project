@@ -9,22 +9,27 @@ const fs = require("fs");
 // create User
 //-----------------------------------------
 const createUserCtrl = expressAsyncHandler(async (req, res) => {
-  //Checking user alredy exist
-  const userExist = await User.findOne({ email: req?.body?.email });
+  const { name, email, factoryName, password, role } = req.body
+
+  console.log(email)
+
+  const userExist = await User.findOne({ email: email });
+
   if (userExist) {
     throw new Error("User already exist ");
   }
   try {
-    const user = await User.create({
-      name: req?.body?.name,
-      factoryName: req?.body?.factoryName,
-      email: req?.body?.email,
-      password: req?.body?.password,
-      role: req?.body?.role,
+    const createdUser = await User.create({
+      name: name,
+      factoryName: factoryName,
+      email: email,
+      password: password,
+      role: role,
     });
-    res.json(user);
-  } catch (error) {
-    res.json(error);
+    return res.json({ message: `User Created Successfully`, data: createdUser });
+  }
+  catch (err) {
+    return res.json({ message: "Something went wrong while registering the user", data: err })
   }
 });
 
@@ -33,12 +38,12 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { name, password } = req.body;
   //check if user exists
-  const userFound = await User.findOne({ email });
+  const userFound = await User.findOne({ name });
   //Check if password is match
   if (userFound && (await userFound.isPasswordMatched(password))) {
-    res.json({
+    return res.json({
       _id: userFound?._id,
       name: userFound?.name,
       email: userFound?.email,
@@ -46,8 +51,8 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
       token: generateToken(userFound._id),
     });
   } else {
-    res.status(401);
-    throw new Error("Invalid Credentials");
+    return res.json({ message: "Invalid Credentials" }).status(401);
+
   }
 });
 
