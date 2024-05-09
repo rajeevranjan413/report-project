@@ -1,13 +1,13 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 
-const BossRouter = () => {
+const UserRoute = () => {
     return (
         <main className='mx-auto max-w-[1200px]'>
-            Boss
+            User
             <Outlet />
         </main>
     )
 }
 
-export default BossRouter
+export default UserRoute

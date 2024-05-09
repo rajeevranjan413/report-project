@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 // import Home from './pages/Home'
 
-import { AdminRouter, BossRouter, UserRouter, WorkerRouter } from './routers/index'
+import { AdminRoute, UserRoute, WorkerRoute, PublicRoute } from './routes/index'
 // import { AdminDashboard, Reports, Users } from './pages/admin'
 
 
@@ -17,26 +17,26 @@ const App = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path='/' element={<PublicRouter />}>
+        <Route path='/' element={<PublicRoute />}>
           <Route index element={<Home />} />
         </Route>
 
-        <Route element={<WorkerRouter />}>
+        <Route element={<WorkerRoute />}>
           <Route path='/dayil-report-update' element={<DailyReportUpdate />} />
         </Route>
 
-        <Route element={<UserRouter />}>
+        <Route element={<UserRoute />}>
           <Route path='/user/reports' element={Reports} />
         </Route>
 
 
-        <Route element={<AdminRouter />}>
+        <Route element={<AdminRoute />}>
           <Route path='/admin/dashboard' element={<AdminDashboard role="admin" />} />
           <Route path='/admin/users' element={Users} />
           <Route path='/admin/reports' />
         </Route>
 
-        <Route element={<BossRouter />}>
+        <Route element={<AdminRoute />}>
           <Route path='/boss/dashboard' element={<AdminDashboard role="boss" />} />
           <Route path='/boss/reports' />
         </Route>

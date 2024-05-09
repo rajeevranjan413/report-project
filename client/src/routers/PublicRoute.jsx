@@ -1,13 +1,15 @@
 import React from 'react'
+import Header from '../components/layout/Header'
 import { Outlet } from 'react-router-dom'
 
-const UserRouter = () => {
+const PublicRouter = () => {
     return (
         <main className='mx-auto max-w-[1200px]'>
-            User
+            <Header />
             <Outlet />
+            Public
         </main>
     )
 }
 
-export default UserRouter
+export default PublicRouter
