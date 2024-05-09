@@ -4,14 +4,15 @@ const User = require("../../model/User/User");
 const validateMongodbID = require("../../utils/validateMongodbID");
 const cloudinaryUploadImg = require("../../utils/cloudinary");
 const fs = require("fs");
+const { default: mongoose } = require("mongoose");
 
 //-----------------------------------------
 // create User
 //-----------------------------------------
 const createUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { name, email, factoryName, password, role } = req.body
+  const { name, email, factory, password, role } = req.body;
 
-  console.log(email)
+  console.log(email);
 
   const userExist = await User.findOne({ email: email });
 
@@ -21,15 +22,20 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const createdUser = await User.create({
       name: name,
-      factoryName: factoryName,
+      factory: new mongoose.Types.ObjectId(factory),
       email: email,
       password: password,
       role: role,
     });
-    return res.json({ message: `User Created Successfully`, data: createdUser });
-  }
-  catch (err) {
-    return res.json({ message: "Something went wrong while registering the user", data: err })
+    return res.json({
+      message: `User Created Successfully`,
+      data: createdUser,
+    });
+  } catch (err) {
+    return res.json({
+      message: "Something went wrong while registering the user",
+      data: err,
+    });
   }
 });
 
@@ -46,26 +52,29 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   const userFound = await User.findOne({ email });
 
   if (!userFound) {
-    return res.json({ message: "user not found" })
+    return res.json({ message: "user not found" });
   }
 
-  const isPasswordValid = await userFound.isPasswordMatched(password)
+  const isPasswordValid = await userFound.isPasswordMatched(password);
 
   if (!isPasswordValid) {
-    return res.json({ message: "Invalid Credentials" })
+    return res.json({ message: "Invalid Credentials" });
   }
 
-  const accessToken = userFound.generateAccessToken(userFound._id, userFound.name, userFound.role)
+  const accessToken = userFound.generateAccessToken(
+    userFound._id,
+    userFound.name,
+    userFound.role
+  );
 
   const options = {
     httpOnly: true,
-    secure: true
-  }
+    secure: true,
+  };
 
-  res.cookie('accessToken', options).json({ message: "User logedIn !", data: userFound })
-
-
-
+  res
+    .cookie("accessToken", options)
+    .json({ message: "User logedIn !", data: userFound });
 });
 
 //-------------------------------

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,8 +12,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    factoryName: {
-      type: String,
+    factory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Factory",
       required: true,
     },
     role: {
@@ -49,14 +50,14 @@ userSchema.methods.generateAccessToken = function (_id, name, role) {
     {
       _id: this._id,
       name: this.name,
-      role: this.role
+      role: this.role,
     },
     process.env.ACCESS_TOKEN_SECRET || "adj23kja;dlkjf",
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "10d"
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "10d",
     }
-  )
-}
+  );
+};
 
 //Compile schema into model
 const User = mongoose.model("User", userSchema);

@@ -5,7 +5,11 @@ const reportSchema = new mongoose.Schema(
   {
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Worker",
+      ref: "User",
+    },
+    factory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Factory",
     },
     area: {
       type: String,
@@ -44,7 +48,7 @@ const reportSchema = new mongoose.Schema(
     comment: {
       type: String,
     },
-    photo: { type: [String] },
+    photo: { type: [String], required: true },
   },
   { timestamps: true }
 );
