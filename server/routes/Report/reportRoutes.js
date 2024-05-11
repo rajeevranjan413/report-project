@@ -4,6 +4,7 @@ const {
   deleteReportCtrl,
   updateReportCtrl,
   getTodaysReportsCtrl,
+  getReportListForAdminCtrl,
 } = require("../../controller/reports/reportsCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 const { photoUpload } = require("../../middleware/photoUpload");
@@ -18,4 +19,6 @@ reportRoutes.post(
 reportRoutes.delete("/deleteReport/:id", authMiddleware, deleteReportCtrl);
 reportRoutes.put("/updateReport/:id", authMiddleware, updateReportCtrl);
 reportRoutes.get("/todayReport", authMiddleware, getTodaysReportsCtrl);
+reportRoutes.get("/allReport", authMiddleware, getReportListForAdminCtrl);
+
 module.exports = reportRoutes;

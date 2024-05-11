@@ -4,6 +4,7 @@ const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
 const cloudinaryUploadImg = require("../../utils/cloudinary");
 const fs = require("fs");
+const { default: mongoose } = require("mongoose");
 
 //-----------------------------------------
 // Add Report Ctrl
@@ -122,10 +123,12 @@ const updateReportCtrl = expressAsyncHandler(async (req, res) => {
 });
 
 //-------------------------------
-// Get Today Report Ctrl
+// Get Today's Report List Ctrl
 //-------------------------------
 
 const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
+  const { _id } = req.user;
+
   try {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
@@ -134,6 +137,7 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
 
     // Query for reports with timestamp between start and end of today
     const todaysReports = await Report.find({
+      createdBy: new mongoose.Types.ObjectId(_id),
       createdAt: { $gte: startOfDay, $lte: endOfDay },
     });
 
@@ -149,9 +153,69 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
   }
 });
 
+const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
+  try {
+    let startDate, endDate;
+    const {
+      startDate: startDateString,
+      endDate: endDateString,
+      factoryId,
+    } = req.body;
+
+    // If start date and end date are provided, parse them
+    if (startDateString && endDateString) {
+      startDate = new Date(startDateString);
+      endDate = new Date(endDateString);
+    } else {
+      // Default to today's date if start date and end date are not provided
+      const today = new Date();
+      startDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0,
+        0
+      );
+      endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999
+      );
+    }
+
+    // Construct query based on start date, end date, and factory ID
+    const query = {
+      createdAt: { $gte: startDate, $lte: endDate },
+    };
+    if (factoryId) {
+      query.factory = factoryId; // Assuming factoryId is the field in the Report model
+    }
+
+    // Fetch reports based on the constructed query
+    const reports = await Report.find(query);
+
+    return res.json({
+      message: `Reports fetched successfully`,
+      data: reports,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong while fetching reports",
+      error: error,
+    });
+  }
+});
+
 module.exports = {
   addReportCtrl,
   deleteReportCtrl,
   updateReportCtrl,
   getTodaysReportsCtrl,
+  getReportListForAdminCtrl,
 };
