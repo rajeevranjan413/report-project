@@ -1,9 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
 const Report = require("../../model/Report/Report");
-const generateToken = require("../../config/generateToken");
-const validateMongodbID = require("../../utils/validateMongodbID");
 const cloudinaryUploadImg = require("../../utils/cloudinary");
-const fs = require("fs");
+
 const { default: mongoose } = require("mongoose");
 
 //-----------------------------------------
