@@ -13,8 +13,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     factory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Factory",
+      type: String,
       required: true,
     },
     role: {

@@ -22,18 +22,21 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const createdUser = await User.create({
       name: name,
-      factory: new mongoose.Types.ObjectId(factory),
+      factory: factory,
       email: email,
       password: password,
       role: role,
     });
+
+
     return res.json({
       message: `User Created Successfully`,
       data: createdUser,
     });
+
   } catch (err) {
     return res.json({
-      message: "Something went wrong while registering the user",
+      message: "Something went wrong while adding the user",
       data: err,
     });
   }
@@ -76,6 +79,10 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
     .cookie("accessToken", options)
     .json({ message: "User logedIn !", data: userFound });
 });
+
+const checkLogged = expressAsyncHandler(async (req, res) => {
+  return res.user;
+})
 
 //-------------------------------
 //Employee List
