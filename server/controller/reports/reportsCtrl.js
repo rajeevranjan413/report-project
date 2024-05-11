@@ -9,7 +9,7 @@ const fs = require("fs");
 // Add Report Ctrl
 //-----------------------------------------
 const addReportCtrl = expressAsyncHandler(async (req, res) => {
-  const { id: _id, factory } = req.user;
+  const { _id, factory } = req.user;
   const { report } = req.body;
   const files = req.files;
   const photosUrls = [];
@@ -23,7 +23,7 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
 
   try {
     const addedReport = await Report.create({
-      createdBy: createdBy,
+      createdBy: _id,
       factory: factory,
       area: report.area,
       topic: report.topic,
