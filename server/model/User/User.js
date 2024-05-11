@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema(
     factory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Factory",
-      required: true,
     },
     role: {
       type: String,
