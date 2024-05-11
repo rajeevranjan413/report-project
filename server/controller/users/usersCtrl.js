@@ -64,7 +64,8 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   const accessToken = userFound.generateAccessToken(
     userFound._id,
     userFound.name,
-    userFound.role
+    userFound.role,
+    userFound.factory
   );
 
   const options = {

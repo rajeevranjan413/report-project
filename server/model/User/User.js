@@ -50,6 +50,7 @@ userSchema.methods.generateAccessToken = function (_id, name, role) {
       _id: this._id,
       name: this.name,
       role: this.role,
+      factory: this.factory,
     },
     process.env.ACCESS_TOKEN_SECRET || "adj23kja;dlkjf",
     {
