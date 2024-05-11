@@ -76,7 +76,7 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   };
 
   res
-    .cookie("accessToken", options)
+    .cookie("accessToken", accessToken, options)
     .json({ message: "User logedIn !", data: userFound });
 });
 
