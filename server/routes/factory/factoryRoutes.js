@@ -2,13 +2,11 @@ const express = require("express");
 const {
     addFactoryCtrl,
 
-} = require("../../controller/reports/reportsCtrl");
+} = require("../../controller/factory/factoryCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
-// const { photoUpload } = require("../../middleware/photoUpload");
 
-const reportRoutes = express.Router();
-reportRoutes.post("/addFactory", addFactoryCtrl);
-// reportRoutes.delete("/deleteReport/:id", authMiddleware);
-// reportRoutes.put("/updateReport/:id", authMiddleware);
-// reportRoutes.get("/todayReport", authMiddleware);
-module.exports = reportRoutes;
+
+const factoryRoutes = express.Router();
+factoryRoutes.post("/addFactory", authMiddleware, addFactoryCtrl);
+
+module.exports = factoryRoutes;

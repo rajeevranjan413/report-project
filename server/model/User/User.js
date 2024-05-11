@@ -13,8 +13,9 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     factory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Factory",
+      type: String,
+      // mongoose.Schema.Types.ObjectId,
+      // ref: "Factory",
     },
     role: {
       type: String,
@@ -44,7 +45,7 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.methods.generateAccessToken = function (_id, name, role) {
+userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -52,7 +53,7 @@ userSchema.methods.generateAccessToken = function (_id, name, role) {
       role: this.role,
       factory: this.factory,
     },
-    process.env.ACCESS_TOKEN_SECRET || "adj23kja;dlkjf",
+    process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "10d",
     }

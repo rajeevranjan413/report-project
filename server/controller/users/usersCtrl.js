@@ -2,9 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const User = require("../../model/User/User");
 // const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
-const cloudinaryUploadImg = require("../../utils/cloudinary");
-const fs = require("fs");
-const { default: mongoose } = require("mongoose");
+
 
 //-----------------------------------------
 // create User
@@ -20,7 +18,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
     throw new Error("User already exist ");
   }
   try {
-    const createdUser = await User.create({
+    const user = await User.create({
       name: name,
       factory: factory,
       email: email,
@@ -28,10 +26,18 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
       role: role,
     });
 
+    const createdUser = await User.findById(user._id).select(
+      "-password -accessToken"
+    )
+
+    if (!createdUser) {
+      return res.json({ message: "Something went wrong while registering the user" })
+    }
+
 
     return res.json({
       message: `User Created Successfully`,
-      data: createdUser,
+      data: createdUser
     });
 
   } catch (err) {
@@ -48,11 +54,11 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  // if (!username && !email) {
-  //   return res.json({ message: "username or email is required" })
-  // }
+  if (!email && !password) {
+    return res.json({ message: "username or email is required" })
+  }
   //check if user exists
-  const userFound = await User.findOne({ email });
+  const userFound = await User.findOne({ email })
 
   if (!userFound) {
     return res.json({ message: "user not found" });
@@ -64,12 +70,9 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
     return res.json({ message: "Invalid Credentials" });
   }
 
-  const accessToken = userFound.generateAccessToken(
-    userFound._id,
-    userFound.name,
-    userFound.role,
-    userFound.factory
-  );
+  const accessToken = userFound.generateAccessToken();
+
+  const loggedInUser = await User.findById(userFound._id).select("-password -accessToken")
 
   const options = {
     httpOnly: true,
@@ -78,11 +81,18 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 
   res
     .cookie("accessToken", accessToken, options)
-    .json({ message: "User logedIn !", data: userFound });
-});
+    .json({ message: "User logedIn !", data: loggedInUser });
+})
 
-const checkLogged = expressAsyncHandler(async (req, res) => {
-  return res.user;
+//-------------------------------
+//Checklogged user
+//-------------------------------
+
+
+const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
+
+  console.log(req.user)
+  return res.json(req.user);
 })
 
 //-------------------------------
@@ -131,6 +141,11 @@ const getClientList = expressAsyncHandler(async (req, res) => {
   }
 });
 
+
+//-------------------------------
+//Delete User
+//-------------------------------
+
 const deleteUserCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongodbID(id);
@@ -149,4 +164,5 @@ module.exports = {
   getManagerList,
   deleteUserCtrl,
   getClientList,
+  checkLoggedCtrl
 };
