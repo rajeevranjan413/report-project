@@ -8,9 +8,9 @@ import { AdminRoute, UserRoute, WorkerRoute, PublicRoute } from './routes/index'
 
 const Home = lazy(() => import('./pages/Home'))
 const DailyReportUpdate = lazy(() => import('./pages/worker/DailyReportUpdate'))
-const Reports = lazy(() => import('./pages/user/Reports'))
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
-const Users = lazy(() => import('./pages/admin/Users'))
+// const Reports = lazy(() => import('./pages/user/Reports'))
+// const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+// const Users = lazy(() => import('./pages/admin/Users'))
 
 
 const App = () => {
