@@ -4,18 +4,19 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/User/User");
 
 const authMiddleware = expressAsyncHandler(async (req, res, next) => {
+  const token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1]
+
+  if (!token) {
+    return res.json({ message: "Unauthorized request" })
+  }
 
   try {
-    const token = req.cookies?.accessToken || req.headers.authorization?.split(" ")[1]
 
-    console.log(token)
-    if (!token) {
-      return res.json({ message: "Unauthorized request" })
-    }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
     const user = await User.findById(decodedToken?._id).select("-password -accessToken")
+
     if (!user) {
       return res.json({ message: "Invalid Access Token" })
     }

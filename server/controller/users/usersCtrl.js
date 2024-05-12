@@ -20,7 +20,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const user = await User.create({
       name: name,
-      factory: factory,
+      factory: new mongoose.Types.ObjectId(factory),
       email: email,
       password: password,
       role: role,
@@ -53,12 +53,12 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if (!email && !password) {
+  const { name, password } = req.body;
+  if (!name && !password) {
     return res.json({ message: "username or email is required" })
   }
   //check if user exists
-  const userFound = await User.findOne({ email })
+  const userFound = await User.findOne({ name })
 
   if (!userFound) {
     return res.json({ message: "user not found" });
@@ -90,9 +90,15 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 
 
 const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
+  const userId = req.user._id
 
-  console.log(req.user)
-  return res.json(req.user);
+  try {
+    const loggedInUser = await User.findById(userId).select("-password -accessToken");
+    return res.json({ message: "ok", data: loggedInUser });
+  }
+  catch (err) {
+    return res.json({ message: "Invalid Credentials", err });
+  }
 })
 
 //-------------------------------

@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import ReportsContainer from '../../components/worker/ReportsContainer';
 import WorkDetail from '../../components/worker/WorkDetail';
+import axios from 'axios';
 
+const getTodayReportData = async () => {
+    const { data } = await axios.get("http://localhost:8000/api/worker/get")
+}
 
 const DailyReportUpdate = () => {
 
@@ -16,7 +20,7 @@ const DailyReportUpdate = () => {
             </div>
 
             <div>
-                <ReportsContainer />
+                {/* <ReportsContainer /> */}
             </div>
 
             <div>

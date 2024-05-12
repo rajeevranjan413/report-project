@@ -1,28 +1,37 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('');
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const data = new FormData(e.target);
+        const formData = new FormData(e.target);
+        const name = formData.get("name")
+        const password = formData.get("password")
+        // console.log(name, password)
 
-        if (data.get("role") === "admin") {
-            navigate("/admin/dashboard")
+        const { data } = await axios.post("http://localhost:8000/api/user/login", {
+            name: name,
+            password: password
+        }, { withCredentials: true })
 
-        }
-        if (data.get("role") === "user") {
-            navigate("/reports")
+        console.log(data.data.role)
 
-        }
-        if (data.get("role") === "worker") {
+        if (data.data.role === "Worker") {
             navigate("/dayil-report-update")
-
         }
+        // if (data.get("role") === "user") {
+        //     navigate("/reports")
+
+        // }
+        // if (data.get("role") === "worker") {
+        //     navigate("/dayil-report-update")
+
+        // }
 
     }
     return (
@@ -40,14 +49,6 @@ const Login = () => {
                         <input onChange={ev => setPassword(ev.target.value)} value={password} className='px-1 py-3 outline-none border border-[#b9bec4] rounded text-sm' id='password' type="password" name='password' />
                     </div>
 
-                    <div className=' flex flex-col gap-1 border-[#b9bec4] '>
-                        <label className=' font-semibold text-sm' htmlFor="role">Select role</label>
-                        <select onChange={ev => setRole(ev.target.value)} value={role} className=' border border-[#b9bec4] px-1 py-3 text-sm outline-none rounded' name="role" id="role">
-                            <option value="worker">Worker</option>
-                            <option value="admin">Admin</option>
-                            <option value="user">User</option>
-                        </select>
-                    </div>
 
                     <div className='flex flex-col mt-8'>
                         <button className='py-3 bg-black text-white font-bold rounded'>Login</button>

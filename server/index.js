@@ -8,7 +8,7 @@ const { errorHandler, notFound } = require("./middleware/errorHandler");
 //const commentRoutes = require("./routes/Comment/commentRoutes");
 require("./config/dbConnect")();
 const app = express();
-app.use(cors());
+app.use(cors({ credentials: true, origin: true, withCredentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
