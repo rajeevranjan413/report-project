@@ -10,7 +10,7 @@ const { default: mongoose } = require("mongoose");
 const addReportCtrl = expressAsyncHandler(async (req, res) => {
   const { _id, factory } = req.user;
   const { report } = req.body;
-  const files = req.files;
+  const files = req.files ? req.files : [];
   const photosUrls = [];
   for (const file of files) {
     const { path } = file;
@@ -19,6 +19,7 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
     photosUrls.push(url);
   }
   console.log(photosUrls);
+  console.log(report);
 
   try {
     const addedReport = await Report.create({
@@ -26,14 +27,14 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
       factory: factory,
       area: report.area,
       topic: report.topic,
-      problem: report.problem,
-      chemical: report.chemical,
-      premise: report.premis,
-      tempature: report.tempature,
-      rating: report.rating,
-      test: report.test,
-      comment: report.comment,
-      photo: photosUrls,
+      problem: report.problem ? report.problem : "",
+      chemical: report.chemical ? report.chemical : "",
+      premise: report.premis ? report.premis : "",
+      tempature: report.tempature ? report.tempature : "",
+      rating: report.rating ? report.rating : "",
+      test: report.test ? report.test : "",
+      comment: report.comment ? report.comment : "",
+      photo: photosUrls.length > 0 ? photosUrls : [],
     });
     return res.json({
       message: `Report added Successfully`,
@@ -42,7 +43,7 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
   } catch (err) {
     return res.json({
       message: "Something went wrong while adding the report",
-      data: err,
+      data: err.message,
     });
   }
 });

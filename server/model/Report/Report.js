@@ -19,17 +19,17 @@ const reportSchema = new mongoose.Schema(
 
     topic: {
       type: String,
-      enum: ["Before Work", "After Work", "Complain"],
+      enum: ["Before Work", "After Work", "Complain", "With Chemical"],
       required: true,
     },
     problem: {
       type: String,
-      enum: ["Water", "Hose", "Covering Up", "Another"],
+      enum: ["Water", "Hose", "Covering Up", "Another", ""],
     },
 
     chemical: {
       type: String,
-      enum: ["Acid", "Alkaline", "Water"],
+      enum: ["Acid", "Alkaline", "Water", ""],
     },
     premise: {
       type: String,
@@ -39,7 +39,7 @@ const reportSchema = new mongoose.Schema(
     },
     rating: {
       type: String,
-      enum: [20, 30, 40, 50, 60, 70, 80, 90, 100],
+      enum: [20, 30, 40, 50, 60, 70, 80, 90, 100, ""],
     },
     test: {
       type: String,

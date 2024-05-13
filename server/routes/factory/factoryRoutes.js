@@ -7,6 +7,6 @@ const authMiddleware = require("../../middleware/authMiddleware");
 
 
 const factoryRoutes = express.Router();
-factoryRoutes.post("/addFactory", authMiddleware, addFactoryCtrl);
+factoryRoutes.post("/addFactory", addFactoryCtrl);
 
 module.exports = factoryRoutes;
