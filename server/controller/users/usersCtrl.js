@@ -2,7 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const User = require("../../model/User/User");
 // const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
-
+const { default: mongoose } = require("mongoose");
 
 //-----------------------------------------
 // create User
@@ -28,19 +28,20 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 
     const createdUser = await User.findById(user._id).select(
       "-password -accessToken"
-    )
+    );
 
     if (!createdUser) {
-      return res.json({ message: "Something went wrong while registering the user" })
+      return res.json({
+        message: "Something went wrong while registering the user",
+      });
     }
-
 
     return res.json({
       message: `User Created Successfully`,
-      data: createdUser
+      data: createdUser,
     });
-
   } catch (err) {
+    console.log(err);
     return res.json({
       message: "Something went wrong while adding the user",
       data: err,
@@ -53,12 +54,12 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { name, password } = req.body;
-  if (!name && !password) {
-    return res.json({ message: "username or email is required" })
+  const { email, password } = req.body;
+  if (!email && !password) {
+    return res.json({ message: "username or email is required" });
   }
   //check if user exists
-  const userFound = await User.findOne({ name })
+  const userFound = await User.findOne({ email });
 
   if (!userFound) {
     return res.json({ message: "user not found" });
@@ -72,7 +73,9 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 
   const accessToken = userFound.generateAccessToken();
 
-  const loggedInUser = await User.findById(userFound._id).select("-password -accessToken")
+  const loggedInUser = await User.findById(userFound._id).select(
+    "-password -accessToken"
+  );
 
   const options = {
     httpOnly: true,
@@ -82,24 +85,24 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   res
     .cookie("accessToken", accessToken, options)
     .json({ message: "User logedIn !", data: loggedInUser });
-})
+});
 
 //-------------------------------
 //Checklogged user
 //-------------------------------
 
-
 const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
-  const userId = req.user._id
+  const userId = req.user._id;
 
   try {
-    const loggedInUser = await User.findById(userId).select("-password -accessToken");
+    const loggedInUser = await User.findById(userId).select(
+      "-password -accessToken"
+    );
     return res.json({ message: "ok", data: loggedInUser });
-  }
-  catch (err) {
+  } catch (err) {
     return res.json({ message: "Invalid Credentials", err });
   }
-})
+});
 
 //-------------------------------
 //Employee List
@@ -147,7 +150,6 @@ const getClientList = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
 //-------------------------------
 //Delete User
 //-------------------------------
@@ -170,5 +172,5 @@ module.exports = {
   getManagerList,
   deleteUserCtrl,
   getClientList,
-  checkLoggedCtrl
+  checkLoggedCtrl,
 };

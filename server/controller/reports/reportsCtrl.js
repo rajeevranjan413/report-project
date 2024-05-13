@@ -158,7 +158,7 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
       startDate: startDateString,
       endDate: endDateString,
       factoryId,
-    } = req.body;
+    } = req.query;
 
     // If start date and end date are provided, parse them
     if (startDateString && endDateString) {
