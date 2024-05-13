@@ -42,7 +42,6 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
       data: createdUser,
     });
   } catch (err) {
-    console.log(err);
     return res.json({
       message: "Something went wrong while adding the user",
       data: err,
@@ -55,12 +54,12 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if (!email && !password) {
+  const { name, password } = req.body;
+  if (!name && !password) {
     return res.json({ message: "username or email is required" });
   }
   //check if user exists
-  const userFound = await User.findOne({ email });
+  const userFound = await User.findOne({ name });
 
   if (!userFound) {
     return res.json({ message: "user not found" });
