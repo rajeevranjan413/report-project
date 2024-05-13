@@ -2,7 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const User = require("../../model/User/User");
 // const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 //-----------------------------------------
 // create User
@@ -17,10 +17,11 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   if (userExist) {
     throw new Error("User already exist ");
   }
+
   try {
     const user = await User.create({
       name: name,
-      factory: new mongoose.Types.ObjectId(factory),
+      $ref: factory,
       email: email,
       password: password,
       role: role,
