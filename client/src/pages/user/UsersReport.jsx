@@ -1,6 +1,6 @@
 import React from 'react'
 import ReportTable from '../../components/admin/ReportTable'
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import DatePicker from '../../components/admin/DatePicker'
 
 
@@ -22,7 +22,7 @@ const UserReport = () => {
                 </div>
 
                 <div className='bg-white mb-2 grid place-items-center h-[150px]' >
-                    <Button variant="contained">Download Report</Button>
+                    {/* <Button variant="contained">Download Report</Button> */}
                 </div>
 
 

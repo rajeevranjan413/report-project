@@ -34,6 +34,7 @@ const Login = () => {
         }
 
     }
+
     return (
         <div className='mt-3 sm:mt-4 md:mt-5'>
             <div className=' bg-white w-full p-8 mx-auto max-w-[480px] rounded-lg'>
