@@ -6,11 +6,8 @@ const {
   getEmployeeList,
   getManagerList,
   deleteUserCtrl,
-<<<<<<< HEAD
-  logoutUserCtrl
-=======
+  logoutUserCtrl,
   getClientList,
->>>>>>> edb062afcc14979b2cc8b95b20f39a2c633261dd
 } = require("../../controller/users/usersCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 
