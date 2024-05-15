@@ -8,9 +8,9 @@ const AdminRoute = () => {
     const reports = useLocation().pathname.includes("/admin/reports")
     console.log(users)
     return (
-        <div className='grid gap-1 grid-cols-4 bg-[rgb(247,247,247)'>
+        <main className='grid gap-2 grid-cols-5 bg-[rgb(247,247,247) h-screen'>
 
-            <aside className=' w-full bg-white p-4 h-screen'>
+            <aside className=' w-full bg-white p-4 overflow-hidden '>
                 <h2>Logo.</h2>
                 <div className='my-8 mx-4'>
                     <h5 className=' opacity-80 my-4'>DASHBOARD</h5>
@@ -32,10 +32,10 @@ const AdminRoute = () => {
                 </div>
             </aside>
 
-            <div className='col-span-3'>
+            <div className='col-span-4 overflow-scroll'>
                 <Outlet />
             </div>
-        </div>
+        </main>
     )
 }
 

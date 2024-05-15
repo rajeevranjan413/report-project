@@ -22,7 +22,7 @@ const PublicRoute = () => {
                 const { data } = await axios.get("http://localhost:8000/api/user/checkLogged", { withCredentials: true })
 
                 if (data.message === "ok") {
-                    const role = data.data.role
+                    const role = data.role
                     if (role === "Worker") {
                         navigate("/dayil-report-update")
                     }
@@ -37,10 +37,13 @@ const PublicRoute = () => {
                     }
 
                 }
+                else {
+                    navigate("/login")
+                }
                 console.log(res.data.message)
             }
             catch (err) {
-                console.log("not helo")
+                console.log("not logged")
             }
 
         }

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import ReportsContainer from '../../components/worker/ReportsContainer';
 import WorkDetail from '../../components/worker/WorkDetail';
 import axios from 'axios';
+import TodayReportTable from '../../components/worker/TodayReportTable';
 
 const getTodayReportData = async () => {
     const { data } = await axios.get("http://localhost:8000/api/worker/get")
@@ -18,9 +19,13 @@ const DailyReportUpdate = () => {
             <div className=''>
                 <WorkDetail />
             </div>
+            <div>
 
+                AddReprt
+            </div>
             <div>
                 {/* <ReportsContainer /> */}
+                <TodayReportTable />
             </div>
 
             <div>

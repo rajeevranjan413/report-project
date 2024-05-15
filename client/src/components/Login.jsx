@@ -19,19 +19,19 @@ const Login = () => {
             password: password
         }, { withCredentials: true })
 
-        console.log(data.data.role)
 
-        if (data.data.role === "Worker") {
+        console.log(data)
+        if (data?.data.role === "Worker") {
             navigate("/dayil-report-update")
         }
-        // if (data.get("role") === "user") {
-        //     navigate("/reports")
+        if (data?.data.role === "Admin") {
+            navigate("/admin/reports")
 
-        // }
-        // if (data.get("role") === "worker") {
-        //     navigate("/dayil-report-update")
+        }
+        if (data?.data.role === "User") {
+            navigate("/user/reports")
 
-        // }
+        }
 
     }
     return (

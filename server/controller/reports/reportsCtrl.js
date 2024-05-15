@@ -192,12 +192,13 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
     const query = {
       createdAt: { $gte: startDate, $lte: endDate },
     };
+
     if (factoryId) {
       query.factory = factoryId; // Assuming factoryId is the field in the Report model
     }
 
     // Fetch reports based on the constructed query
-    const reports = await Report.find(query);
+    const reports = await Report.find({});
 
     return res.json({
       message: `Reports fetched successfully`,

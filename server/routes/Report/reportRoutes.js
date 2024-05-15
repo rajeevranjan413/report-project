@@ -19,6 +19,6 @@ reportRoutes.post(
 reportRoutes.delete("/deleteReport/:id", authMiddleware, deleteReportCtrl);
 reportRoutes.put("/updateReport/:id", authMiddleware, updateReportCtrl);
 reportRoutes.get("/todayReport", authMiddleware, getTodaysReportsCtrl);
-reportRoutes.get("/allReport", authMiddleware, getReportListForAdminCtrl);
+reportRoutes.get("/allReport", getReportListForAdminCtrl);
 
 module.exports = reportRoutes;

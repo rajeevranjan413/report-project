@@ -164,13 +164,25 @@ const deleteUserCtrl = expressAsyncHandler(async (req, res) => {
     res.json(error);
   }
 });
+const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
+
+  const options = {
+    httpOnly: true,
+    secure: true
+  }
+
+  return res
+    .clearCookie("accessToken", options)
+    .json({ message: "User logged Out" })
+});
 
 module.exports = {
   createUserCtrl,
   loginUserCtrl,
+  logoutUserCtrl,
   getEmployeeList,
   getManagerList,
-  deleteUserCtrl,
   getClientList,
+  deleteUserCtrl,
   checkLoggedCtrl,
 };
