@@ -2,12 +2,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
+const temp = require("temp");
 const { errorHandler, notFound } = require("./middleware/errorHandler");
 //const photoRoutes = require("./routes/Photo/photoRoutes");
 //const commentRoutes = require("./routes/Comment/commentRoutes");
 require("./config/dbConnect")();
 const app = express();
+temp.track();
 app.use(cors({ credentials: true, origin: true, withCredentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
