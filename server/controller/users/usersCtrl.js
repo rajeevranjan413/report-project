@@ -9,13 +9,22 @@ const mongoose = require("mongoose");
 //-----------------------------------------
 const createUserCtrl = expressAsyncHandler(async (req, res) => {
   const { name, email, factory, password, role } = req.body;
+  if (
+    [name, email, factory, password, role].some((field) => field?.trim() === "")
+  ) {
+    return res.json({
+      message: `All fields are require`,
+    });
+  }
 
-  console.log(email);
+  // console.log(email);
 
   const userExist = await User.findOne({ email: email });
 
   if (userExist) {
-    throw new Error("User already exist ");
+    return res.json({
+      message: `User already exist `,
+    });
   }
 
   try {

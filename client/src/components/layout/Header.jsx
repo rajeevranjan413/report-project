@@ -1,18 +1,35 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { AntDesignOutlined } from '@ant-design/icons';
+import { Avatar, Button } from 'antd';
+import axios from 'axios';
 
 
 const Header = () => {
+    const navigate = useNavigate();
+    const handleLogout = async () => {
+        const { data } = await axios.get("http://localhost:8000/api/user/logout", { withCredentials: true })
+        if (data.message === "User logged Out") {
+            navigate("/")
+        }
+    }
     return (
-        <div className='h-[80px] flex items-center justify-between font-bold text-xl px-4 md:px-8 lg:px-12 bg-white'>
+        <div className='h-[80px] flex items-center justify-between font-bold text-xl px-4 bg-white'>
             <Link to="/">
                 <h1>header</h1>
             </Link>
 
-            <div>
-                <div className='w-[40px] h-[40px]  rounded-full bg-[#e3e6e3]'>
+            <div className='flex items-center gap-4'>
 
-                </div>
+                <Avatar
+
+                    icon={<AntDesignOutlined />}
+                />
+                <Button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "4px", backgroundColor: "black" }} type="primary">
+
+                    Logout
+                </Button>
+
 
             </div>
         </div>

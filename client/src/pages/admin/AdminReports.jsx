@@ -1,13 +1,14 @@
-import React from 'react'
-import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import ReportTable from '../../components/ReportTable'
-import ReportFilters from '../../components/admin/ReportFilters'
 import { Button } from 'antd';
 import { FaArrowAltCircleDown } from "react-icons/fa";
+import ReportFilters from '../../components/admin/ReportFilters';
+import axios from 'axios';
 
 
 
-const UserReport = () => {
+const AdminReports = () => {
+
 
     const handleDownloadReport = async () => {
         try {
@@ -44,33 +45,23 @@ const UserReport = () => {
         }
     }
     return (
-        <div className='bg-white mt-3 sm:mt-4 md:mt-5 h-[400px]'>
-            <div className=' text-sm font-bold  bg-slate-100'>
-
-                <div className='flex justify-between p-4 mt-4 mb-6'>
-                    <h1 className='text-xl font-bold'>Reports</h1>
-                    <Button style={{ display: "flex", alignItems: "center", gap: "4px" }} type="primary" onClick={handleDownloadReport}>
-                        <FaArrowAltCircleDown />
-                        Download Report
-                    </Button>
-                </div>
-                <div className='mb-2'>
-                    <ReportFilters />
-                </div>
-
-                <div>
-                    <ReportTable />
-                </div>
-
-                <div className='bg-white mb-2 grid place-items-center h-[150px]' >
-                    {/* <Button variant="contained">Download Report</Button> */}
-                </div>
-
-
-
+        <div>
+            <div className='flex justify-between p-4 mt-4 mb-6'>
+                <h1 className='text-xl font-bold'>Reports</h1>
+                <Button style={{ display: "flex", alignItems: "center", gap: "4px" }} type="primary" onClick={handleDownloadReport}>
+                    <FaArrowAltCircleDown />
+                    Download Report
+                </Button>
             </div>
+            <div className='mb-2'>
+                <ReportFilters />
+            </div>
+            <div>
+                <ReportTable />
+            </div>
+
         </div>
     )
 }
 
-export default UserReport
+export default AdminReports

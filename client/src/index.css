@@ -3,9 +3,15 @@
 @tailwind utilities;
 
 body {
-    background-color: #e3e6e3;
+    background-color: #f5f8ff;
 }
+
+
 
 option {
     padding: 0 10px;
+}
+
+.MuiFormControl-root {
+    margin-left: 0;
 }

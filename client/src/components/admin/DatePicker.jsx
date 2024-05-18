@@ -1,28 +1,24 @@
-import * as React from 'react';
-import dayjs from 'dayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import React from 'react';
+import { DatePicker, Space, ConfigProvider } from 'antd';
+const { RangePicker } = DatePicker;
+const DatePickers = () => (
+    <ConfigProvider
+        theme={{
+            components: {
+                DatePicker: {
 
-export default function DatePickerValue() {
-    const [value, setValue] = React.useState(dayjs('2022-04-17'));
+                }
+            },
+        }}
+    >
+        <Space direction="vertical" size={12}>
+            <RangePicker
+                style={{
+                    height: '40px',
+                }}
+            />
 
-    return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['DatePicker', 'DatePicker']}>
+        </Space>
 
-                <DatePicker
-                    label="from"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                />
-                <DatePicker
-                    label="to"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                />
-            </DemoContainer>
-        </LocalizationProvider>
-    );
-}
+    </ConfigProvider>);
+export default DatePickers;

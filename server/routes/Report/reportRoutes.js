@@ -13,8 +13,8 @@ const { photoUpload } = require("../../middleware/photoUpload");
 const reportRoutes = express.Router();
 reportRoutes.post(
   "/addReport",
-  photoUpload.array("photos"),
   authMiddleware,
+  photoUpload.array("photos"),
   addReportCtrl
 );
 reportRoutes.delete("/deleteReport/:id", authMiddleware, deleteReportCtrl);

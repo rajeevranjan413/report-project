@@ -8,9 +8,9 @@ const Home = lazy(() => import('./pages/Home'))
 const DailyReportUpdate = lazy(() => import('./pages/worker/DailyReportUpdate'))
 
 /* ------------ Admin Pages ------------*/
-const Reports = lazy(() => import('./pages/admin/Reports'))
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
-const Users = lazy(() => import('./pages/admin/Users'))
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+// const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
 
 /* ------------ Users Pages ------------*/
 
@@ -45,9 +45,8 @@ const App = () => {
 /* ------------ Admin Routes ------------*/
 
         <Route element={<AdminRoute />}>
-          <Route path='/admin/dashboard' element={<AdminDashboard role="admin" />} />
-          <Route path='/admin/users' element={<Users />} />
-          <Route path='/admin/reports' element={<Reports />} />
+          <Route path='/admin/users' element={<AdminUsers />} />
+          <Route path='/admin/reports' element={<AdminReports />} />
         </Route>
 
 /* ------------ Boss Routes ------------*/

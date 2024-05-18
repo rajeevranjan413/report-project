@@ -21,14 +21,14 @@ const Login = () => {
 
 
         console.log(data)
-        if (data?.data.role === "Worker") {
+        if (data?.data?.role === "Worker") {
             navigate("/dayil-report-update")
         }
-        if (data?.data.role === "Admin") {
+        if (data?.data?.role === "Admin") {
             navigate("/admin/reports")
 
         }
-        if (data?.data.role === "User") {
+        if (data?.data?.role === "User") {
             navigate("/user/reports")
 
         }
@@ -36,8 +36,8 @@ const Login = () => {
     }
 
     return (
-        <div className='mt-3 sm:mt-4 md:mt-5'>
-            <div className=' bg-white w-full p-8 mx-auto max-w-[480px] rounded-lg'>
+        <div className='mt-3 sm:mt-4 md:mt-5 h-screen  '>
+            <div className=' bg-white w-full px-8 py-16 mx-auto max-w-[480px]  h-full rounded-lg'>
                 <h1 className='mb-8 text-center text-lg font-bold border-b border-black pb-4'>Welcome !</h1>
                 <form onSubmit={handleLogin} className='grid gap-4'>
 

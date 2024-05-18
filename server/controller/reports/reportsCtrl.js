@@ -32,7 +32,7 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
       topic: report.topic,
       problem: report.problem ? report.problem : "",
       chemical: report.chemical ? report.chemical : "",
-      premise: report.premis ? report.premis : "",
+      premise: report.premise ? report.premise : "",
       tempature: report.tempature ? report.tempature : "",
       rating: report.rating ? report.rating : "",
       test: report.test ? report.test : "",
@@ -231,6 +231,7 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
       size: "A4",
       layout: "landscape",
     });
+
     const tempFilePath = temp.path({ suffix: ".pdf" });
 
     const writeStream = fs.createWriteStream(tempFilePath);

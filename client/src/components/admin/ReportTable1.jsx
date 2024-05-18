@@ -68,16 +68,16 @@ const columns = [
     //         </>
     //     ),
     // },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                <a>Edit {record.name}</a>
-                <a>Delete</a>
-            </Space>
-        ),
-    },
+    // {
+    //     title: 'Action',
+    //     key: 'action',
+    //     render: (_, record) => (
+    //         <Space size="middle">
+    //             <a>Edit {record.name}</a>
+    //             <a>Delete</a>
+    //         </Space>
+    //     ),
+    // },
 ];
 
 const App = () => {
@@ -98,7 +98,7 @@ const App = () => {
 
     }, [])
 
-    console.log(reports)
+    console.log("report table")
     return (
         <ConfigProvider
             theme={{
