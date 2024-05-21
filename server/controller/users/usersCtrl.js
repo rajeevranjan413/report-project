@@ -7,8 +7,20 @@ const mongoose = require("mongoose");
 //-----------------------------------------
 // create User
 //-----------------------------------------
+
+function generatePassword() {
+  var length = 8,
+    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    retVal = "";
+  for (var i = 0, n = charset.length; i < length; ++i) {
+    retVal += charset.charAt(Math.floor(Math.random() * n));
+  }
+  return retVal;
+}
+
 const createUserCtrl = expressAsyncHandler(async (req, res) => {
-  const { name, email, factory, password, role } = req.body;
+  const { name, email, factory, role } = req.body;
+  const password = generatePassword();
   if (
     [name, email, factory, password, role].some((field) => field?.trim() === "")
   ) {
@@ -30,7 +42,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   try {
     const user = await User.create({
       name: name,
-      $ref: factory,
+      factory: new mongoose.Types.ObjectId(factory),
       email: email,
       password: password,
       role: role,
@@ -49,6 +61,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
     return res.json({
       message: `User Created Successfully`,
       data: createdUser,
+      password: password,
     });
   } catch (err) {
     return res.json({
@@ -174,15 +187,14 @@ const deleteUserCtrl = expressAsyncHandler(async (req, res) => {
   }
 });
 const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
-
   const options = {
     httpOnly: true,
-    secure: true
-  }
+    secure: true,
+  };
 
   return res
     .clearCookie("accessToken", options)
-    .json({ message: "User logged Out" })
+    .json({ message: "User logged Out" });
 });
 
 module.exports = {

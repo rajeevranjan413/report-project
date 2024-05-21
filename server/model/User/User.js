@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    login: {
+      type: String,
+    },
+    logout: {
+      type: String,
+    },
     factory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Factory",

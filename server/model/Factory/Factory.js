@@ -6,8 +6,13 @@ const factorySchema = new mongoose.Schema({
     required: true,
   },
   areas: {
-    type: [String],
-  }
+    type: [
+      {
+        value: { type: String },
+      },
+    ],
+    required: true,
+  },
 });
 
 const Factory = mongoose.model("Factory", factorySchema);
