@@ -16,7 +16,10 @@ const AdminReports = () => {
                 "http://localhost:8000/api/report/generate-pdf",
                 {
                     responseType: "blob",
-                }
+                },
+
+                { withCredentials: true }
+
             );
 
             // Create a Blob from the response data

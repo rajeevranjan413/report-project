@@ -16,6 +16,7 @@ const UserReport = () => {
                 {
                     responseType: "blob",
                 }
+                , { withCredentials: true }
             );
 
             // Create a Blob from the response data

@@ -46,7 +46,7 @@ const Login = () => {
                         <input onChange={ev => setName(ev.target.value)} value={name} className='px-1 py-3 outline-none border border-[#b9bec4] rounded text-sm name' id='name' type="text" name='name' />
                     </div>
                     <div className='flex flex-col gap-1'>
-                        <label className=' font-semibold text-sm' htmlFor="password">Passowrd</label>
+                        <label className=' font-semibold text-sm' htmlFor="password">Password</label>
                         <input onChange={ev => setPassword(ev.target.value)} value={password} className='px-1 py-3 outline-none border border-[#b9bec4] rounded text-sm' id='password' type="password" name='password' />
                     </div>
 

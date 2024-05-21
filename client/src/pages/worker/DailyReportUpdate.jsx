@@ -20,7 +20,7 @@ const DailyReportUpdate = () => {
     return (
         <div className='mt-3 sm:mt-4 md:mt-5'>
             <div className='flex justify-between p-4 mt-4 mb-6'>
-                <h1 className='text-xl font-bold'>Reports</h1>
+                <h1 className='text-xl font-bold'>Your's Today Reports</h1>
                 {/* <Button
                     onClick={showModal}
                     variant="contained"

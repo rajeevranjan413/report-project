@@ -25,7 +25,7 @@ const Header = () => {
 
                     icon={<AntDesignOutlined />}
                 />
-                <Button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "4px", backgroundColor: "black" }} type="primary">
+                <Button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "4px", backgroundColor: "grey  " }} type="primary">
 
                     Logout
                 </Button>

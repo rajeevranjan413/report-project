@@ -144,10 +144,10 @@ const NewReportCard = ({ setVisible }) => {
                         : Data2.map((ele, index) => <ReportData setComplain={setComplain} key={index} name={ele?.name} label={ele?.label} type={ele?.type} options={ele?.options} isDisplay={ele?.isDisplay} complain={complain} />)
                 }
 
-                <div className=' bg-red-300 w-full'>
+                <div className='mt-2'>
                     <button className='flex items-center gap-2 text-white bg-black py-2 px-4' type='submit'>
                         <IoIosAddCircle />
-                        Add Report
+                        Save Report
                     </button>
 
                 </div>
