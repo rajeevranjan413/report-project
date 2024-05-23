@@ -5,6 +5,9 @@ import { Button, Modal, Form, Input } from "antd";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FactoryTable from "../../components/admin/FactoryTable";
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import EditFactoryModal from "../../components/admin/EditFctoryModel";
 
 const { Search } = Input;
 
@@ -17,6 +20,10 @@ const AdminFactory = () => {
   const limit = 10;
   const [offset, setOffset] = useState(0);
   const [change, setChange] = useState(false);
+
+  const [factoryForEdit, setFactoryForEdit] = useState(null);
+  const [editModelOpen, setEditModelOpen] = useState(null);
+  const [factoryId, setFactoryId] = useState(null);
 
   useEffect(() => {
     async function getFactoryList(search, offset, limit) {
@@ -52,7 +59,7 @@ const AdminFactory = () => {
         "http://localhost:8000/api/factory/addFactory",
         {
           name: name,
-          areas: fields,
+          areas: fields.map((field) => field.value),
         },
         { withCredentials: true }
       );
@@ -94,6 +101,7 @@ const AdminFactory = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setEditModelOpen(false);
   };
 
   const onSearch = (value) => {
@@ -108,6 +116,55 @@ const AdminFactory = () => {
 
   const handleRemoveInput = (index) => {
     setFields(fields.filter((field, i) => i !== index));
+  };
+
+  useEffect(() => {
+    const getFactoryDetails = async () => {
+      console.log(factoryId);
+      // setEditModelOpen(true); // Open the edit modal once the user data is fetched
+
+      try {
+        const { data } = await axios.get(
+          `http://localhost:8000/api/factory/details/${factoryId}`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(data);
+        if (data.success == true) setFactoryForEdit(data?.detail);
+      } catch (error) {
+        toast.error("Failed to fetch selected Factory");
+      }
+    };
+
+    if (factoryId) {
+      getFactoryDetails();
+    }
+  }, [factoryId]);
+
+  const handleEditOk = async (factory) => {
+    console.log(factory);
+    try {
+      const { data } = await axios.post(
+        `http://localhost:8000/api/factory/edit-factory/${factoryForEdit._id}`,
+        {
+          name: factory.name,
+          areas: factory.areas,
+        },
+        { withCredentials: true }
+      );
+      console.log(data);
+      if (data.success === true) {
+        setEditModelOpen(false);
+        toast.success("User Updated");
+        setEditModelOpen(false);
+        setChange(!change); // Trigger a refresh to fetch the updated user list
+      } else {
+        toast.error("User Edit Fail");
+      }
+    } catch (error) {
+      toast.error("Failed to update user");
+    }
   };
 
   return (
@@ -145,16 +202,29 @@ const AdminFactory = () => {
             {
               title: "Areas",
               dataIndex: "areas",
-              render: (item) => item.map((i, k) => <p key={k}>{i.value}</p>),
+              render: (item) => item.map((i, k) => <p key={k}>{i}</p>),
             },
             {
               title: "Action",
               render: (item) => (
-                <button onClick={() => handleDelete(item._id)}>Delete</button>
+                <div>
+                  <button
+                    onClick={() => {
+                      setEditModelOpen(true);
+                      setFactoryId(item._id);
+                    }}
+                  >
+                    <FaRegEdit />
+                  </button>{" "}
+                  <button onClick={() => handleDelete(item._id)}>
+                    <MdOutlineDeleteOutline />
+                  </button>
+                </div>
               ),
             },
           ]}
-          data={factoryData}
+          data={factoryData || []}
+          pageSize={10}
         />
       </div>
 
@@ -204,6 +274,15 @@ const AdminFactory = () => {
           </Form>
         </Modal>
       </div>
+
+      {factoryForEdit && (
+        <EditFactoryModal
+          isModalOpen={editModelOpen}
+          handleOk={handleEditOk}
+          handleCancel={handleCancel}
+          factoryData={factoryForEdit}
+        />
+      )}
     </div>
   );
 };

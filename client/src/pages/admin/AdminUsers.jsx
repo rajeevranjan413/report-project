@@ -1,55 +1,77 @@
-import { useState, useEffect } from "react";
-import UserTable from "../../components/admin/UserTable";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { IoIosAddCircle } from "react-icons/io";
 import { Button, Modal, Select, Input } from "antd";
-const { Search } = Input;
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import WorkersTable from "../../components/admin/WorkersTable";
+import ManagersTable from "../../components/admin/ManagersTable";
+import ClientsTable from "../../components/admin/ClientList";
+import AdminTable from "../../components/admin/AdminTable";
+import EditUserModal from "../../components/admin/EditUserModal";
 
 const AdminUsers = () => {
   const [factoryData, setFactoryData] = useState([]);
   const [change, setChange] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [email, setEmail] = useState("");
-  const [factory, setFactory] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    role: "",
+    email: "",
+    factory: "",
+  });
   const [isPasswordModelOpen, setIsPasswordModelOpen] = useState(false);
   const [newUser, setNewUser] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userForEdit, setUserForEdit] = useState(null);
+  const [editModelOpen, setEditModelOpen] = useState(false);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = async () => {
-    let message;
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/user/createUser",
-        {
-          name,
-          email,
-          role,
-          factory,
-        },
+        formData,
         { withCredentials: true }
       );
-      message = data.message;
-      if (message === "User Created Successfully") {
+      if (data.message === "User Created Successfully") {
         setIsModalOpen(false);
         toast.success("User Created");
         setIsPasswordModelOpen(true);
         setNewUser(data.password);
-        setChange(!change); // Trigger a refresh to fetch the updated user list
+        setChange(!change);
       } else {
-        toast.error(message);
+        toast.error(data.message);
       }
     } catch (error) {
       toast.error("Failed to create user");
     }
   };
 
+  const handleEditOk = async (updatedUser) => {
+    try {
+      const { data } = await axios.post(
+        `http://localhost:8000/api/user/editUser/${userForEdit._id}`,
+        updatedUser,
+        { withCredentials: true }
+      );
+      if (data.success) {
+        setEditModelOpen(false);
+        toast.success("User Updated");
+        setChange(!change);
+      } else {
+        toast.error("User Edit Failed");
+      }
+    } catch (error) {
+      toast.error("Failed to update user");
+    }
+  };
+
   const handleCancel = () => {
+    setEditModelOpen(false);
     setIsModalOpen(false);
   };
 
@@ -57,37 +79,53 @@ const AdminUsers = () => {
     setIsPasswordModelOpen(false);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const handleRoleChange = (value) => {
-    setRole(value);
+    setFormData((prevData) => ({ ...prevData, role: value }));
   };
 
   const handleFactoryChange = (value) => {
-    setFactory(value);
+    setFormData((prevData) => ({ ...prevData, factory: value }));
   };
 
-  const onSearch = (value) => {
-    // Implement search functionality
-    console.log("Search:", value);
-  };
+  const fetchFactoryList = useCallback(async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:8000/api/factory/factory-list",
+        { withCredentials: true }
+      );
+      setFactoryData(data.detail.factory);
+    } catch (error) {
+      toast.error("Failed to fetch factory list");
+    }
+  }, []);
 
-  useEffect(() => {
-    const getFactoryList = async (search = "", offset = 0, limit = 10) => {
+  const fetchUserDetails = useCallback(async () => {
+    if (userId) {
       try {
         const { data } = await axios.get(
-          "http://localhost:8000/api/factory/factory-list",
-          {
-            params: { search, offset, limit },
-            withCredentials: true,
-          }
+          `http://localhost:8000/api/user/details/${userId}`,
+          { withCredentials: true }
         );
-        setFactoryData(data.detail.factory);
+        setUserForEdit(data.data.user);
+        setEditModelOpen(true);
       } catch (error) {
-        toast.error("Failed to fetch factory list");
+        toast.error("Failed to fetch selected User");
       }
-    };
+    }
+  }, [userId]);
 
-    getFactoryList();
-  }, [change]);
+  useEffect(() => {
+    fetchFactoryList();
+  }, [change, fetchFactoryList]);
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, [userId, fetchUserDetails]);
 
   return (
     <div>
@@ -103,19 +141,28 @@ const AdminUsers = () => {
           Create New User
         </Button>
       </div>
-      {["Workers", "Managers", "Users"].map((category) => (
-        <div className="mb-2" key={category}>
-          <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-            <h5>{category}</h5>
-            <Search
-              placeholder={`search ${category.toLowerCase()}`}
-              onSearch={onSearch}
-              style={{ width: 200 }}
-            />
-          </div>
-          <UserTable category={category} />
-        </div>
-      ))}
+      <div className="mb-2">
+        <WorkersTable
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
+        <ManagersTable
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
+        <ClientsTable
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
+        <AdminTable
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
+      </div>
 
       <Modal
         centered
@@ -129,7 +176,7 @@ const AdminUsers = () => {
           <div className="flex flex-col gap-1">
             <label htmlFor="role">Role</label>
             <Select
-              value={role}
+              value={formData.role}
               style={{ width: 120 }}
               onChange={handleRoleChange}
               options={[
@@ -143,7 +190,7 @@ const AdminUsers = () => {
           <div className="flex flex-col gap-1">
             <label htmlFor="factory">Factory</label>
             <Select
-              value={factory}
+              value={formData.factory}
               style={{ width: 120 }}
               onChange={handleFactoryChange}
             >
@@ -160,8 +207,8 @@ const AdminUsers = () => {
               type="text"
               id="name"
               name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={handleInputChange}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -170,8 +217,8 @@ const AdminUsers = () => {
               type="email"
               id="email"
               name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleInputChange}
             />
           </div>
         </div>
@@ -185,6 +232,16 @@ const AdminUsers = () => {
       >
         <div className="h1">{newUser}</div>
       </Modal>
+
+      {userForEdit && (
+        <EditUserModal
+          isModalOpen={editModelOpen}
+          handleOk={handleEditOk}
+          handleCancel={handleCancel}
+          userData={userForEdit}
+          factoryData={factoryData}
+        />
+      )}
     </div>
   );
 };

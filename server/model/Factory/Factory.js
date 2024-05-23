@@ -6,11 +6,7 @@ const factorySchema = new mongoose.Schema({
     required: true,
   },
   areas: {
-    type: [
-      {
-        value: { type: String },
-      },
-    ],
+    type: [String],
     required: true,
   },
 });

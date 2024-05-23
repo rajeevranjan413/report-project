@@ -68,21 +68,45 @@ const getFactoryListCtrl = expressAsyncHandler(async (req, res) => {
 });
 const getIndividualFactoryCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   try {
     const factory = await Factory.findById(id);
 
     return res.json({
       message: "Factory Fetched Successfully",
       detail: factory,
+      success: true,
     });
   } catch (err) {
     console.log(err);
-    return res.json({ message: "Factory Fetch faild", err });
+    return res.json({ success: false, message: "Factory Fetch faild", err });
   }
 });
+
+const editFactoryCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, areas } = req.body;
+  try {
+    const factory = await Factory.findByIdAndUpdate(id, {
+      name,
+      areas,
+    });
+
+    return res.json({
+      message: "Factory Created Successfully",
+      detail: factory,
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({ success: false, message: "Factory creation faild", err });
+  }
+});
+
 module.exports = {
   addFactoryCtrl,
   deleteFactoryCtrl,
   getFactoryListCtrl,
   getIndividualFactoryCtrl,
+  editFactoryCtrl,
 };

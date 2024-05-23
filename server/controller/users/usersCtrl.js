@@ -130,15 +130,76 @@ const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
 //Employee List
 //-------------------------------
 
+const escapeRegex = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+};
+
 const getEmployeeList = expressAsyncHandler(async (req, res) => {
-  //check if user exists
-  const userFound = await User.find({ role: "Worker" });
-  //Check if password is match
-  if (userFound) {
-    res.json(userFound);
-  } else {
-    res.status(401);
-    throw new Error("Invalid Credentials");
+  // Helper function to escape special characters for regex
+  const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
+  try {
+    const { search = "" } = req.query;
+    const regexSearch = new RegExp(escapeRegex(search), "i");
+
+    const userFound = await User.aggregate([
+      {
+        $match: {
+          role: "Worker",
+        },
+      },
+      {
+        $lookup: {
+          from: "factories", // The name of the factory collection
+          localField: "factory", // The field in the User collection
+          foreignField: "_id", // The field in the Factory collection
+          as: "factoryDetails",
+        },
+      },
+      {
+        $unwind: "$factoryDetails",
+      },
+      {
+        $match: {
+          $or: [
+            { name: { $regex: regexSearch } },
+            { email: { $regex: regexSearch } },
+            { "factoryDetails.name": { $regex: regexSearch } },
+          ],
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          factory: "$factoryDetails.name",
+        },
+      },
+    ]);
+
+    // Check if users are found
+    if (userFound.length > 0) {
+      res.json({
+        success: true,
+        message: "Employee List fetched",
+        data: {
+          users: userFound,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No employees found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Employee Fetch Fail",
+      error,
+    });
   }
 });
 
@@ -147,13 +208,70 @@ const getEmployeeList = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const getManagerList = expressAsyncHandler(async (req, res) => {
-  const userFound = await User.find({ role: "Manager" });
-  //Check if password is match
-  if (userFound) {
-    res.json(userFound);
-  } else {
-    res.status(401);
-    throw new Error("Invalid Credentials");
+  const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
+  try {
+    const { search = "" } = req.query;
+    const regexSearch = new RegExp(escapeRegex(search), "i");
+
+    const userFound = await User.aggregate([
+      {
+        $match: {
+          role: "Manager",
+        },
+      },
+      {
+        $lookup: {
+          from: "factories", // The name of the factory collection
+          localField: "factory", // The field in the User collection
+          foreignField: "_id", // The field in the Factory collection
+          as: "factoryDetails",
+        },
+      },
+      {
+        $unwind: "$factoryDetails",
+      },
+      {
+        $match: {
+          $or: [
+            { name: { $regex: regexSearch } },
+            { email: { $regex: regexSearch } },
+            { "factoryDetails.name": { $regex: regexSearch } },
+          ],
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          factory: "$factoryDetails.name",
+        },
+      },
+    ]);
+
+    // Check if users are found
+    if (userFound.length > 0) {
+      res.json({
+        success: true,
+        message: "Employee List fetched",
+        data: {
+          users: userFound,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No employees found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Employee Fetch Fail",
+      error,
+    });
   }
 });
 
@@ -162,13 +280,142 @@ const getManagerList = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const getClientList = expressAsyncHandler(async (req, res) => {
-  const userFound = await User.find({ role: "Client" });
-  //Check if password is match
-  if (userFound) {
-    res.json(userFound);
-  } else {
-    res.status(401);
-    throw new Error("Invalid Credentials");
+  const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
+  try {
+    const { search = "" } = req.query;
+    const regexSearch = new RegExp(escapeRegex(search), "i");
+
+    const userFound = await User.aggregate([
+      {
+        $match: {
+          role: "User",
+        },
+      },
+      {
+        $lookup: {
+          from: "factories", // The name of the factory collection
+          localField: "factory", // The field in the User collection
+          foreignField: "_id", // The field in the Factory collection
+          as: "factoryDetails",
+        },
+      },
+      {
+        $unwind: "$factoryDetails",
+      },
+      {
+        $match: {
+          $or: [
+            { name: { $regex: regexSearch } },
+            { email: { $regex: regexSearch } },
+            { "factoryDetails.name": { $regex: regexSearch } },
+          ],
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          factory: "$factoryDetails.name",
+        },
+      },
+    ]);
+
+    // Check if users are found
+    if (userFound.length > 0) {
+      res.json({
+        success: true,
+        message: "Employee List fetched",
+        data: {
+          users: userFound,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No employees found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Employee Fetch Fail",
+      error,
+    });
+  }
+});
+
+//-------------------------------
+//Client List
+//-------------------------------
+
+const getAdminList = expressAsyncHandler(async (req, res) => {
+  const escapeRegex = (text) => {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
+  try {
+    const { search = "" } = req.query;
+    const regexSearch = new RegExp(escapeRegex(search), "i");
+
+    const userFound = await User.aggregate([
+      {
+        $match: {
+          role: "Admin",
+        },
+      },
+      {
+        $lookup: {
+          from: "factories", // The name of the factory collection
+          localField: "factory", // The field in the User collection
+          foreignField: "_id", // The field in the Factory collection
+          as: "factoryDetails",
+        },
+      },
+      {
+        $unwind: "$factoryDetails",
+      },
+      {
+        $match: {
+          $or: [
+            { name: { $regex: regexSearch } },
+            { email: { $regex: regexSearch } },
+            { "factoryDetails.name": { $regex: regexSearch } },
+          ],
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          factory: "$factoryDetails.name",
+        },
+      },
+    ]);
+
+    // Check if users are found
+    if (userFound.length > 0) {
+      res.json({
+        success: true,
+        message: "Employee List fetched",
+        data: {
+          users: userFound,
+        },
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No employees found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Employee Fetch Fail",
+      error,
+    });
   }
 });
 
@@ -181,11 +428,71 @@ const deleteUserCtrl = expressAsyncHandler(async (req, res) => {
   validateMongodbID(id);
   try {
     const deleteUser = await User.findByIdAndDelete(id);
-    res.json(deleteUser);
+    res.json({
+      success: true,
+      data: {
+        user: deleteUser,
+        message: "User Deleted",
+      },
+    });
   } catch (error) {
-    res.json(error);
+    return res.json({ message: "Employee Delete Fail", err });
   }
 });
+
+//-------------------------------
+// User Details
+//-------------------------------
+
+const userDetailsCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongodbID(id);
+  try {
+    const user = await User.findById(id);
+    res.json({
+      success: true,
+      data: {
+        user: user,
+        message: "User Fetched",
+      },
+    });
+  } catch (error) {
+    return res.json({ message: "Employee Fetch Fail", err });
+  }
+});
+
+const userEditCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, email, factory, role } = req.body;
+  if ([name, email, factory, role].some((field) => field?.trim() === "")) {
+    return res.json({
+      message: `All fields are require`,
+    });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(id, {
+      name: name,
+      factory: new mongoose.Types.ObjectId(factory),
+      email: email,
+      role: role,
+    });
+
+    return res.json({
+      message: `User Created Successfully`,
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "Something went wrong while adding the user",
+      data: err,
+      success: false,
+    });
+  }
+});
+
 const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
@@ -203,7 +510,10 @@ module.exports = {
   logoutUserCtrl,
   getEmployeeList,
   getManagerList,
+  getAdminList,
   getClientList,
   deleteUserCtrl,
   checkLoggedCtrl,
+  userDetailsCtrl,
+  userEditCtrl,
 };

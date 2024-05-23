@@ -1,8 +1,12 @@
 import { Table } from "antd";
 
-const FactoryTable = ({ data, columns }) => {
+const FactoryTable = ({ data, columns, pageSize }) => {
   return (
-    <Table dataSource={data} columns={columns} pagination={{ pageSize: 7 }} />
+    <Table
+      dataSource={data}
+      columns={columns}
+      pagination={{ pageSize: pageSize }}
+    />
   );
 };
 
