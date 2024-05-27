@@ -193,7 +193,11 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
     };
 
     if (factoryId) {
-      query.factory = factoryId; // Assuming factoryId is the field in the Report model
+      query.factory = new mongoose.Types.ObjectId(factoryId); // Assuming factoryId is the field in the Report model
+    }
+
+    if (topic) {
+      query.topic = topic; // Assuming topic is the field in the Report model
     }
 
     // Fetch reports based on the constructed query
