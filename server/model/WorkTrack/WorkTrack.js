@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const workTrackSchema = new mongoose.Schema(
   {
-    workerName: {
+    worker: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Worker",
     },
@@ -12,6 +12,10 @@ const workTrackSchema = new mongoose.Schema(
       required: true,
     },
     checkedOut: {
+      type: String,
+      required: true,
+    },
+    factory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Factory",
     },
