@@ -68,7 +68,12 @@ userSchema.methods.generateAccessToken = async function () {
   }
 
   // Calculate expiration time based on current time (adjust expiration as needed)
-  const expiration = luthemiaTime.add(1, 'days').toDate();
+
+
+  const desiredExpiration = luthemiaTime.clone().set({ hour: 6, minute: 0, second: 0 });
+const timeDifference = desiredExpiration.diff(luthemiaTime, 'minutes', true); // Include milliseconds
+
+const expiration = luthemiaTime.add(timeDifference, 'minutes').toDate();
 
   // Generate and return the JWT
   return jwt.sign({
