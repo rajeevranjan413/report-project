@@ -158,16 +158,12 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
 const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
   try {
     let startDate, endDate;
-    const {
-      startDate: startDateString,
-      endDate: endDateString,
-      factoryId,
-    } = req.query;
-
+    const { date: date, factoryId, topic } = req.query;
+    console.log(req.query);
     // If start date and end date are provided, parse them
-    if (startDateString && endDateString) {
-      startDate = new Date(startDateString);
-      endDate = new Date(endDateString);
+    if (date) {
+      startDate = new Date(date[0]);
+      endDate = new Date(date[1]);
     } else {
       // Default to today's date if start date and end date are not provided
       const today = new Date();
@@ -191,7 +187,7 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
       );
     }
 
-    // Construct query based on start date, end date, and factory ID
+    // Construct query based on start date, end date, factory ID, and topic
     const query = {
       createdAt: { $gte: startDate, $lte: endDate },
     };

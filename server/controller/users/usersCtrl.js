@@ -348,7 +348,7 @@ const getClientList = expressAsyncHandler(async (req, res) => {
 });
 
 //-------------------------------
-//Client List
+//Admin List
 //-------------------------------
 
 const getAdminList = expressAsyncHandler(async (req, res) => {
