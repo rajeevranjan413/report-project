@@ -11,6 +11,7 @@ const {
   getAdminList,
   userDetailsCtrl,
   userEditCtrl,
+  changePassword,
 } = require("../../controller/users/usersCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 
