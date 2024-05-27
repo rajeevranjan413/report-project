@@ -52,52 +52,29 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+
 userSchema.methods.generateAccessToken = async function () {
-  // Determine current time in Luthemia time zone (replace with your actual time zone)
-  const luthemiaTime = moment().tz('Europe/Amsterdam'); // Adjust as needed
+  const currentTime = moment().tz('Europe/Vilnius');
 
-if(this.role == "Worker"){
+  if (this.role === "Worker") {
+    const loginWindowStart = currentTime.clone().set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
+    const loginWindowEnd = loginWindowStart.clone().add(1, 'days').set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
 
-  // Define login window start (17:50) and end (next day 6:00) in Luthemia time
-  const loginWindowStart = luthemiaTime.clone().set({ hour: 18, minute: 00 });
-  const loginWindowEnd = loginWindowStart.clone().add(1, 'days').set({ hour: 6, minute: 01 });
+    // Adjust the login window start to previous day if current time is between 00:00 and 06:00
+    if (currentTime.hour() < 6) {
+      loginWindowStart.subtract(1, 'days');
+    }
 
-  // Check if current time falls within the login window
-  const isWithinLoginWindow = luthemiaTime.isBetween(loginWindowStart, loginWindowEnd, 'minutes', '[]');
+    const isWithinLoginWindow = currentTime.isBetween(loginWindowStart, loginWindowEnd, null, '[]');
+    if (!isWithinLoginWindow) {
+      throw new Error('Login is not allowed at this time. Please try again between 6:00 PM and 6:00 AM Lithuania time.');
+    }
 
-  if (!isWithinLoginWindow) {
-    throw new Error('Login is not allowed at this time. Please try again between 5:50 PM and 6:00 AM Luthemia time.');
+    const expirationTime = loginWindowEnd.diff(currentTime, 'seconds');
+    return jwt.sign({ _id: this._id, name: this.name, role: this.role, factory: this.factory }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: expirationTime });
+  } else {
+    return jwt.sign({ _id: this._id, name: this.name, role: this.role, factory: this.factory }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10d" });
   }
-
-  // Calculate expiration time based on current time (adjust expiration as needed)
-
-
-  const desiredExpiration = luthemiaTime.clone().set({ hour: 6, minute: 0, second: 0 });
-const timeDifference = desiredExpiration.diff(luthemiaTime, 'minutes', true); // Include milliseconds
-
-
-    // Generate and return the JWT
-  return jwt.sign({
-    _id: this._id,
-    name: this.name,
-    role: this.role,
-    factory: this.factory,
-  }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: expiration,
-  });
-}
-else{
-   // Generate and return the JWT
-  return jwt.sign({
-    _id: this._id,
-    name: this.name,
-    role: this.role,
-    factory: this.factory,
-  }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "10d",
-  });
-}
- 
 };
 
 //Compile schema into model
