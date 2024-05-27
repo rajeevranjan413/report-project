@@ -56,6 +56,8 @@ userSchema.methods.generateAccessToken = async function () {
   // Determine current time in Luthemia time zone (replace with your actual time zone)
   const luthemiaTime = moment().tz('Europe/Amsterdam'); // Adjust as needed
 
+if(this.role == "Worker"){
+
   // Define login window start (17:50) and end (next day 6:00) in Luthemia time
   const loginWindowStart = luthemiaTime.clone().set({ hour: 18, minute: 00 });
   const loginWindowEnd = loginWindowStart.clone().add(1, 'days').set({ hour: 6, minute: 01 });
@@ -73,9 +75,8 @@ userSchema.methods.generateAccessToken = async function () {
   const desiredExpiration = luthemiaTime.clone().set({ hour: 6, minute: 0, second: 0 });
 const timeDifference = desiredExpiration.diff(luthemiaTime, 'minutes', true); // Include milliseconds
 
-const expiration = luthemiaTime.add(timeDifference, 'minutes').toDate();
 
-  // Generate and return the JWT
+    // Generate and return the JWT
   return jwt.sign({
     _id: this._id,
     name: this.name,
@@ -84,6 +85,19 @@ const expiration = luthemiaTime.add(timeDifference, 'minutes').toDate();
   }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: expiration,
   });
+}
+else{
+   // Generate and return the JWT
+  return jwt.sign({
+    _id: this._id,
+    name: this.name,
+    role: this.role,
+    factory: this.factory,
+  }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "10d",
+  });
+}
+ 
 };
 
 //Compile schema into model
