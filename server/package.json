@@ -11,6 +11,7 @@
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
+    "moment-timezone": "^0.5.45",
     "mongoose": "^8.3.3",
     "pdfkit": "^0.15.0",
     "pdfkit-table": "^0.1.99",

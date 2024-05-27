@@ -201,16 +201,16 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
     }
 
     // Fetch reports based on the constructed query
-    const reports = await Report.find({});
+    const reports = await Report.find(query);
 
     return res.json({
-      message: `Reports fetched successfully`,
+      message: "Reports fetched successfully",
       data: reports,
     });
   } catch (error) {
     return res.status(500).json({
       message: "Something went wrong while fetching reports",
-      error: error,
+      error: error.message,
     });
   }
 });

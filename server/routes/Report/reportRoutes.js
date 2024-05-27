@@ -9,11 +9,13 @@ const {
 } = require("../../controller/reports/reportsCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 const { photoUpload } = require("../../middleware/photoUpload");
+const workTrackMiddleware = require("../../middleware/workTrackMiddleware");
 
 const reportRoutes = express.Router();
 reportRoutes.post(
   "/addReport",
   authMiddleware,
+  workTrackMiddleware,
   photoUpload.array("photos"),
   addReportCtrl
 );

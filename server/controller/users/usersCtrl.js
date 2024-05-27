@@ -3,6 +3,8 @@ const User = require("../../model/User/User");
 // const generateToken = require("../../config/generateToken");
 const validateMongodbID = require("../../utils/validateMongodbID");
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
+const WorkTrack = require("../../model/WorkTrack/WorkTrack");
 
 //-----------------------------------------
 // create User
@@ -93,11 +95,30 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
     return res.json({ message: "Invalid Credentials" });
   }
 
-  const accessToken = userFound.generateAccessToken();
-
+  const accessToken = await userFound.generateAccessToken();
   const loggedInUser = await User.findById(userFound._id).select(
     "-password -accessToken"
   );
+  if (loggedInUser.role == "Worker") {
+    const todaysWorkTrack = await WorkTrack.find({
+      worker: new mongoose.Types.ObjectId(loggedInUser),
+      dateString: getFormattedDate(),
+    });
+    if (todaysWorkTrack.length == 0) {
+      const currentTime = moment().tz("Europe/Vilnius");
+      const workTrack = new WorkTrack({
+        worker: loggedInUser._id,
+        checkedIn: currentTime.toDate(),
+        dateString: getFormattedDate(),
+        factory: loggedInUser.factory,
+      });
+      try {
+        await workTrack.save();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
   const options = {
     httpOnly: true,
@@ -494,6 +515,24 @@ const userEditCtrl = expressAsyncHandler(async (req, res) => {
 });
 
 const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
+  const { id, role } = req.user;
+
+  try {
+    if (role == "Worker") {
+      const currentTime = moment().tz("Europe/Vilnius");
+
+      await WorkTrack.findOneAndUpdate(
+        {
+          worker: id,
+          dateString: getFormattedDate(),
+        },
+        { checkedOut: currentTime }
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
   const options = {
     httpOnly: true,
     secure: true,
@@ -503,6 +542,55 @@ const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
     .clearCookie("accessToken", options)
     .json({ message: "User logged Out" });
 });
+
+const changePassword = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { oldPassword, newPassword, conformPassword } = req.body;
+
+  try {
+    if (newPassword === conformPassword) {
+      throw new Error("Conform Password Doesnt match ");
+    }
+
+    const user = await User.findById(id);
+    const isPasswordValid = await user.isPasswordMatched(oldPassword);
+
+    if (!isPasswordValid) {
+      throw new Error("Write correct Password");
+    }
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      password: newPassword,
+    });
+
+    res.json({
+      success: true,
+      message: "Password Updated",
+      data: {
+        users: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Password update Fail",
+      error,
+    });
+  }
+});
+
+function getFormattedDate() {
+  const now = moment();
+  const hour = now.hour();
+
+  // Check if time is between 00:00 and 6:00
+  if (hour >= 0 && hour < 6) {
+    // Use subtract to get the previous day's date
+    return now.subtract(1, "days").format("DD-MM-YYYY");
+  } else {
+    // Use current date
+    return now.format("DD-MM-YYYY");
+  }
+}
 
 module.exports = {
   createUserCtrl,
@@ -516,4 +604,5 @@ module.exports = {
   checkLoggedCtrl,
   userDetailsCtrl,
   userEditCtrl,
+  changePassword,
 };

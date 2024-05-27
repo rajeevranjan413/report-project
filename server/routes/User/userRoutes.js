@@ -28,5 +28,6 @@ userRoutes.get("/clientList", authMiddleware, getClientList);
 userRoutes.get("/details/:id", authMiddleware, userDetailsCtrl);
 userRoutes.delete("/deleteUser/:id", authMiddleware, deleteUserCtrl);
 userRoutes.post("/editUser/:id", authMiddleware, userEditCtrl);
+userRoutes.post("/edit-password", authMiddleware, changePassword);
 
 module.exports = userRoutes;

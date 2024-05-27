@@ -1,17 +1,19 @@
 const mongoose = require("mongoose");
 
-
 const workTrackSchema = new mongoose.Schema(
   {
     worker: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Worker",
+      ref: "User",
     },
     checkedIn: {
-      type: String,
+      type: Date,
       required: true,
     },
     checkedOut: {
+      type: Date,
+    },
+    dateString: {
       type: String,
       required: true,
     },
@@ -19,7 +21,6 @@ const workTrackSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Factory",
     },
-
   },
   { timestamps: true }
 );

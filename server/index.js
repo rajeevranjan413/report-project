@@ -17,8 +17,8 @@ app.use(express.static(__dirname + "/public"));
 
 const userRoutes = require("./routes/user/userRoutes");
 const factoryRoutes = require("./routes/factory/factoryRoutes");
-// const reportRoutes = require("./routes/report/reportRoutes")
 const reportRoutes = require("./routes/report/reportRoutes");
+const wtRoutes = require("./routes/WorkTrack/workTrack");
 
 app.get("/", (req, res) => {
   res.send("hello");
@@ -27,6 +27,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/factory", factoryRoutes);
 app.use("/api/report", reportRoutes);
+app.use("/api/wt", wtRoutes);
 
 //error handler
 app.use(notFound);

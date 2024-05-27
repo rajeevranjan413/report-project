@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const jwt = require('jsonwebtoken');
-const moment = require('moment-timezone');
+const moment = require("moment-timezone");
 
 const userSchema = new mongoose.Schema(
   {
@@ -52,28 +51,57 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-
 userSchema.methods.generateAccessToken = async function () {
-  const currentTime = moment().tz('Europe/Vilnius');
+  const currentTime = moment().tz("Europe/Vilnius");
 
   if (this.role === "Worker") {
-    const loginWindowStart = currentTime.clone().set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
-    const loginWindowEnd = loginWindowStart.clone().add(1, 'days').set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+    const loginWindowStart = currentTime
+      .clone()
+      .set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
+    const loginWindowEnd = loginWindowStart
+      .clone()
+      .add(1, "days")
+      .set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
 
     // Adjust the login window start to previous day if current time is between 00:00 and 06:00
     if (currentTime.hour() < 6) {
-      loginWindowStart.subtract(1, 'days');
+      loginWindowStart.subtract(1, "days");
     }
 
-    const isWithinLoginWindow = currentTime.isBetween(loginWindowStart, loginWindowEnd, null, '[]');
+    const isWithinLoginWindow = currentTime.isBetween(
+      loginWindowStart,
+      loginWindowEnd,
+      null,
+      "[]"
+    );
     if (!isWithinLoginWindow) {
-      throw new Error('Login is not allowed at this time. Please try again between 6:00 PM and 6:00 AM Lithuania time.');
+      throw new Error(
+        "Login is not allowed at this time. Please try again between 6:00 PM and 6:00 AM Lithuania time."
+      );
     }
 
-    const expirationTime = loginWindowEnd.diff(currentTime, 'seconds');
-    return jwt.sign({ _id: this._id, name: this.name, role: this.role, factory: this.factory }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: expirationTime });
+    const expirationTime = loginWindowEnd.diff(currentTime, "seconds");
+    return jwt.sign(
+      {
+        _id: this._id,
+        name: this.name,
+        role: this.role,
+        factory: this.factory,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: expirationTime }
+    );
   } else {
-    return jwt.sign({ _id: this._id, name: this.name, role: this.role, factory: this.factory }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10d" });
+    return jwt.sign(
+      {
+        _id: this._id,
+        name: this.name,
+        role: this.role,
+        factory: this.factory,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "10d" }
+    );
   }
 };
 
