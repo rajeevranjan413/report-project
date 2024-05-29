@@ -23,7 +23,6 @@ const wtRoutes = require("./routes/WorkTrack/workTrack");
 app.get("/", (req, res) => {
   res.send("hello");
 });
-
 app.use("/api/user", userRoutes);
 app.use("/api/factory", factoryRoutes);
 app.use("/api/report", reportRoutes);

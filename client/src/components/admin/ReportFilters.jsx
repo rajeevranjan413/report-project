@@ -61,7 +61,9 @@ export default function ReportFilters({ setFilter }) {
         </Space>
       </div>
       <div>
-        <DatePickers onChange={onChange} />
+        <Space direction="vertical" size={12}>
+          <DatePickers onChange={onChange} />
+        </Space>
       </div>
       <div>
         <Space wrap>

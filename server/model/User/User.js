@@ -52,8 +52,7 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 };
 
 userSchema.methods.generateAccessToken = async function () {
-  const currentTime = moment().tz("Europe/Vilnius");
-
+  const currentTime = moment().tz("Europe/Vilnius").add(3, "hour");
   if (this.role === "Worker") {
     const loginWindowStart = currentTime
       .clone()
@@ -62,6 +61,7 @@ userSchema.methods.generateAccessToken = async function () {
       .clone()
       .add(1, "days")
       .set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+    console.log(loginWindowEnd.toDate());
 
     // Adjust the login window start to previous day if current time is between 00:00 and 06:00
     if (currentTime.hour() < 6) {

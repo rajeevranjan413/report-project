@@ -19,6 +19,7 @@ const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
 // const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminFactory = lazy(() => import("./pages/admin/AdminFactory"));
+const AdminWorkReport = lazy(() => import("./pages/admin/AdminWorkReport"));
 
 /* ------------ Users Pages ------------*/
 
@@ -46,6 +47,7 @@ const App = () => {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/factory" element={<AdminFactory />} />
+          <Route path="/admin/work-report" element={<AdminWorkReport />} />
         </Route>
         {/* ------------ Boss Routes ------------*/}{" "}
         {/* 

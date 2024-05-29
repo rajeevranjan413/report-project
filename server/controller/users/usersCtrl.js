@@ -5,6 +5,7 @@ const validateMongodbID = require("../../utils/validateMongodbID");
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
 const WorkTrack = require("../../model/WorkTrack/WorkTrack");
+const getCurrentTimeInLithuania = require("../../utils/getCurrentTimeInLithunia");
 
 //-----------------------------------------
 // create User
@@ -79,6 +80,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
 
 const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   const { name, password } = req.body;
+
   if (!name && !password) {
     return res.json({ message: "username or email is required" });
   }
@@ -105,10 +107,10 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
       dateString: getFormattedDate(),
     });
     if (todaysWorkTrack.length == 0) {
-      const currentTime = moment().tz("Europe/Vilnius");
+      const currentTime = getCurrentTimeInLithuania();
       const workTrack = new WorkTrack({
         worker: loggedInUser._id,
-        checkedIn: currentTime.toDate(),
+        checkedIn: currentTime,
         dateString: getFormattedDate(),
         factory: loggedInUser.factory,
       });
@@ -519,8 +521,8 @@ const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
 
   try {
     if (role == "Worker") {
-      const currentTime = moment().tz("Europe/Vilnius");
-
+      const currentTime = getCurrentTimeInLithuania();
+      console.log(currentTime);
       await WorkTrack.findOneAndUpdate(
         {
           worker: id,
@@ -585,10 +587,10 @@ function getFormattedDate() {
   // Check if time is between 00:00 and 6:00
   if (hour >= 0 && hour < 6) {
     // Use subtract to get the previous day's date
-    return now.subtract(1, "days").format("DD-MM-YYYY");
+    return now.subtract(1, "days").format("YYYY-MM-DD");
   } else {
     // Use current date
-    return now.format("DD-MM-YYYY");
+    return now.format("YYYY-MM-DD");
   }
 }
 

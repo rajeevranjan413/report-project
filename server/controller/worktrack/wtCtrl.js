@@ -3,11 +3,12 @@ const WorkTrack = require("../../model/WorkTrack/WorkTrack");
 const moment = require("moment-timezone");
 
 const getWtCtrl = expressAsyncHandler(async (req, res) => {
-  const { date } = req.params;
+  const { date } = req.query;
+  console.log(date);
   try {
     const wtList = await WorkTrack.find({
       dateString: date ?? getFormattedDate(),
-    });
+    }).populate("worker");
 
     return res.status(200).json({
       message: "Work Track List",
@@ -30,10 +31,10 @@ function getFormattedDate() {
   // Check if time is between 00:00 and 6:00
   if (hour >= 0 && hour < 6) {
     // Use subtract to get the previous day's date
-    return now.subtract(1, "days").format("DD-MM-YYYY");
+    return now.subtract(1, "days").format("YYYY-MM-DD");
   } else {
     // Use current date
-    return now.format("DD-MM-YYYY");
+    return now.format("YYYY-MM-DD");
   }
 }
 
