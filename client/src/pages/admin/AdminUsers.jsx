@@ -9,6 +9,53 @@ import ManagersTable from "../../components/admin/ManagersTable";
 import ClientsTable from "../../components/admin/ClientList";
 import AdminTable from "../../components/admin/AdminTable";
 import EditUserModal from "../../components/admin/EditUserModal";
+import { useSelector } from "react-redux";
+
+
+
+
+const translations = {
+  eng: {
+    titleUsers: "Users",
+    createNewUser: "Create New User",
+    role: "Role",
+    factory: "Factory",
+    name: "Name",
+    email: "Email",
+    okText:"Create",
+    title:"New User",
+    cancel:"Cancel",
+    action:"Action",
+    save:"Save",
+    edit:"Edit User",
+    workers:"Workers",
+    managers:"Managers",
+    admins:"Admins",
+    clients:"Clients",
+    placeholder:"Search Factory Name"
+  },
+  lit: {
+    titleUsers: "Vartotojai", // Lithuanian translation for "Users"
+    createNewUser: "Sukurti naują vartotoją", // Lithuanian translation for "Create New User"
+    role: "Rolė", // Lithuanian translation for "Role"
+    factory: "Gamykla", // Lithuanian translation for "Factory"
+    name: "Vardas", // Lithuanian translation for "Name"
+    email: "El. paštas", // Lithuanian translation for "Email"
+    okText:"sukurti",
+    title:"Naujas vartotojas",
+    cancel:"Atšaukti",
+    action:"veiksmas",
+    save:"Sutaupyti",
+    edit:"Redaguoti naudotoją",
+    workers:"Darbininkai",
+    managers:"Vadovai",
+    admins:"Administratoriai",
+    clients:"Klientų",
+    placeholder:"Ieškokite gamyklos pavadinimo"
+  },
+};
+
+
 
 const AdminUsers = () => {
   const [factoryData, setFactoryData] = useState([]);
@@ -25,7 +72,10 @@ const AdminUsers = () => {
   const [userId, setUserId] = useState(null);
   const [userForEdit, setUserForEdit] = useState(null);
   const [editModelOpen, setEditModelOpen] = useState(false);
+  const { userAuth } = useSelector((store) => store?.system); // Access language from Redux
 
+  const currentLang = userAuth?.language || "eng"; // Default to English if no language set
+  const text = translations[currentLang];
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -131,33 +181,39 @@ const AdminUsers = () => {
     <div>
       <ToastContainer />
       <div className="flex justify-between p-4 mt-4 mb-6">
-        <h1 className="text-xl font-bold">Users</h1>
+        <h1 className="text-xl font-bold">{text.titleUsers}</h1> {/* Use translated title */}
         <Button
           style={{ display: "flex", alignItems: "center", gap: "4px" }}
           type="primary"
           onClick={showModal}
         >
-          <IoIosAddCircle />
-          Create New User
+          <IoIosAddCircle /> {text.createNewUser} {/* Use translated button text */}
         </Button>
       </div>
       <div className="mb-2">
         <WorkersTable
+          text={text}
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
         />
         <ManagersTable
+                  text={text}
+
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
         />
         <ClientsTable
+                  text={text}
+
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
         />
         <AdminTable
+                  text={text}
+
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
@@ -166,15 +222,16 @@ const AdminUsers = () => {
 
       <Modal
         centered
-        okText="Create"
-        title="New User"
+        okText={text.okText}
+        title={text.title}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        cancelText={text.cancel}
       >
         <div className="mt-4 grid gap-2">
           <div className="flex flex-col gap-1">
-            <label htmlFor="role">Role</label>
+            <label htmlFor="role">{text.role}</label>
             <Select
               value={formData.role}
               style={{ width: 120 }}
@@ -188,7 +245,7 @@ const AdminUsers = () => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="factory">Factory</label>
+            <label htmlFor="factory">{text.factory}</label>
             <Select
               value={formData.factory}
               style={{ width: 120 }}
@@ -202,7 +259,7 @@ const AdminUsers = () => {
             </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">{text.name}</label>
             <Input
               type="text"
               id="name"
@@ -212,7 +269,7 @@ const AdminUsers = () => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{text.email}</label>
             <Input
               type="email"
               id="email"
@@ -235,6 +292,7 @@ const AdminUsers = () => {
 
       {userForEdit && (
         <EditUserModal
+        text={text}
           isModalOpen={editModelOpen}
           handleOk={handleEditOk}
           handleCancel={handleCancel}

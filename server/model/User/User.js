@@ -32,6 +32,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    firstLogin:{
+      type: Boolean,
+      default:true
+    },
+    language:{
+      type: String,
+      enum:["eng","lit"],
+      default:"eng"
+    }
   },
   { timestamps: true }
 );
@@ -53,7 +62,7 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 
 userSchema.methods.generateAccessToken = async function () {
   const currentTime = moment().tz("Europe/Vilnius").add(3, "hour");
-  if (this.role === "Worker") {
+  if (this.role === "") {
     const loginWindowStart = currentTime
       .clone()
       .set({ hour: 18, minute: 0, second: 0, millisecond: 0 });

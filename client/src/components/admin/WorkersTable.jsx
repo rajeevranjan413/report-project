@@ -9,7 +9,7 @@ import { FaRegEdit } from "react-icons/fa";
 
 const { Search } = Input;
 
-const WorkersTable = ({ selected, openModel, set }) => {
+const WorkersTable = ({ text,selected, openModel, set }) => {
   const [workersData, setWorkersData] = useState([]);
   const [search, setSearch] = useState("");
   const [offset, setOffset] = useState(0);
@@ -63,9 +63,9 @@ const WorkersTable = ({ selected, openModel, set }) => {
     <div>
       <div className="mb-2">
         <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-          <h5>Workers</h5>
+          <h5>{text.workers}</h5>
           <Search
-            placeholder="Search Factory Name"
+            placeholder={text.placeholder}
             onSearch={onSearch}
             style={{ width: 200 }}
           />
@@ -73,21 +73,21 @@ const WorkersTable = ({ selected, openModel, set }) => {
         <FactoryTable
           columns={[
             {
-              title: "Name",
+              title: `${text.name}`,
               dataIndex: "name",
               key: "name",
             },
             {
-              title: "Email",
+              title: `${text.email}`,
               dataIndex: "email",
               key: "email",
             },
             {
-              title: "Factory",
+              title: `${text.factory}`,
               render: (item) => <p>{item?.factory ?? "-"}</p>,
             },
             {
-              title: "Action",
+              title: `${text.action}`,
               render: (item) => (
                 <div>
                   <button

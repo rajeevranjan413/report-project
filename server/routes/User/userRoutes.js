@@ -12,6 +12,7 @@ const {
   userDetailsCtrl,
   userEditCtrl,
   changePassword,
+  switchLanguageCtrl,
 } = require("../../controller/users/usersCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 
@@ -28,6 +29,8 @@ userRoutes.get("/clientList", authMiddleware, getClientList);
 userRoutes.get("/details/:id", authMiddleware, userDetailsCtrl);
 userRoutes.delete("/deleteUser/:id", authMiddleware, deleteUserCtrl);
 userRoutes.post("/editUser/:id", authMiddleware, userEditCtrl);
-userRoutes.post("/edit-password", authMiddleware, changePassword);
+userRoutes.post("/change-password", authMiddleware, changePassword);
+userRoutes.post("/language-switch", authMiddleware, switchLanguageCtrl);
+
 
 module.exports = userRoutes;

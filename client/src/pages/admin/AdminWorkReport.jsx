@@ -4,9 +4,36 @@ import { toast } from "react-toastify";
 import FactoryTable from "../../components/admin/FactoryTable";
 import { DatePicker, Space } from "antd";
 import moment from "moment-timezone";
+import { useSelector } from "react-redux";
+
+
+
+const translations = {
+  eng: {
+    factories: "Factories",
+    date: "Date",
+    name: "Name",
+    email: "Email",
+    checkInTime: "Check-In Time",
+    checkOutTime: "Check-Out Time",
+  },
+  lit: {
+    factories: "Gamyklos", // Lithuanian translation for Factories
+    date: "Data",
+    name: "Vardas", // Lithuanian translation for Name
+    email: "El. paštas", // Lithuanian translation for Email
+    checkInTime: "Registracijos laikas", // Lithuanian translation for Check-In Time
+    checkOutTime: "Pasitraukimo laikas", // Lithuanian translation for Check-Out Time
+  },
+};
+
+
+
+
 const AdminWorkReport = () => {
   const [report, setReport] = useState([]);
   const [date, setDate] = useState(null);
+  const { userAuth } = useSelector((store) => store?.system);
   useEffect(() => {
     const getWtDetails = async () => {
       try {
@@ -67,11 +94,12 @@ const AdminWorkReport = () => {
     return formattedTime;
   }
   console.log(getCurrentTimeInLithuania());
+  const currentText = translations[userAuth?.language || "eng"];
   return (
     <>
       <div className="mb-2">
         <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-          <h5>Factories</h5>
+          <h5>{currentText.factories}</h5> {/* Use translated text for Factories */}
           <Space direction="vertical" size={12}>
             <DatePicker onChange={onChange} />
           </Space>
@@ -79,27 +107,25 @@ const AdminWorkReport = () => {
         <FactoryTable
           columns={[
             {
-              title: "Date",
+              title: currentText.date, // Use translated text for Date
               dataIndex: "dateString",
               key: "dateString",
             },
             {
-              title: "Name",
+              title: currentText.name, // Use translated text for Name
               render: (item) => <p>{item?.worker?.name}</p>,
             },
             {
-              title: "Email",
+              title: currentText.email, // Use translated text for Email
               render: (item) => <p>{item?.worker?.email}</p>,
             },
             {
-              title: "CheckIn Time",
+              title: currentText.checkInTime, // Use translated text for Check-In Time
               render: (item) => <p>{convertUTCTimeTo24Hour(item.checkedIn)}</p>,
             },
             {
-              title: "CheckOut Time",
-              render: (item) => (
-                <p>{convertUTCTimeTo24Hour(item.checkedOut)}</p>
-              ),
+              title: currentText.checkOutTime, // Use translated text for Check-Out Time
+              render: (item) => <p>{convertUTCTimeTo24Hour(item.checkedOut)}</p>,
             },
           ]}
           data={report}

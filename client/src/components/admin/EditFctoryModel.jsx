@@ -6,6 +6,7 @@ const EditFactoryModal = ({
   handleOk,
   handleCancel,
   factoryData,
+  currentText
 }) => {
   const [name, setName] = useState(factoryData?.name || "");
   const [fields, setFields] = useState(factoryData?.areas || []);
@@ -42,7 +43,7 @@ const EditFactoryModal = ({
     >
       <div className="mt-4 grid gap-2">
         <div className="flex flex-col gap-1">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">{currentText.name}</label>
           <Input
             className="p-2 border outline-none rounded"
             type="text"
@@ -61,13 +62,13 @@ const EditFactoryModal = ({
               onChange={(e) => handleFieldChange(index, e.target.value)}
             />
             <Button type="danger" onClick={() => handleRemoveInput(index)}>
-              Remove
+            {currentText.delete}
             </Button>
           </Form.Item>
         ))}
         <Form.Item>
           <Button type="primary" onClick={handleAddInput}>
-            Add Area
+          {currentText.addArea}
           </Button>
         </Form.Item>
       </Form>

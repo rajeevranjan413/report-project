@@ -158,8 +158,7 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
 const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
   try {
     let startDate, endDate;
-    const { date: date, factoryId, topic } = req.query;
-    console.log(req.query);
+    const { date: date, factory, topic } = req.query;
     // If start date and end date are provided, parse them
     if (date) {
       startDate = new Date(date[0]);
@@ -192,8 +191,8 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
       createdAt: { $gte: startDate, $lte: endDate },
     };
 
-    if (factoryId) {
-      query.factory = new mongoose.Types.ObjectId(factoryId); // Assuming factoryId is the field in the Report model
+    if (factory) {
+      query.factory = new mongoose.Types.ObjectId(factory); // Assuming factoryId is the field in the Report model
     }
 
     if (topic) {
@@ -217,9 +216,50 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
 
 const downloadReport = expressAsyncHandler(async (req, res) => {
   try {
-    const reports = await Report.find({})
-      .populate("createdBy")
-      .populate("factory");
+    let startDate, endDate;
+    const { date, factory, topic } = req.query;
+    // If start date and end date are provided, parse them
+    if (date) {
+      startDate = new Date(date[0]);
+      endDate = new Date(date[1]);
+    } else {
+      // Default to today's date if start date and end date are not provided
+      const today = new Date();
+      startDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        0,
+        0,
+        0,
+        0
+      );
+      endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        23,
+        59,
+        59,
+        999
+      );
+    }
+
+    // Construct query based on start date, end date, factory ID, and topic
+    const query = {
+      createdAt: { $gte: startDate, $lte: endDate },
+    };
+
+    if (factory) {
+      query.factory = new mongoose.Types.ObjectId(factory); // Assuming factoryId is the field in the Report model
+    }
+
+    if (topic) {
+      query.topic = topic; // Assuming topic is the field in the Report model
+    }
+
+    // Fetch reports based on the constructed query
+    const reports = await Report.find(query).populate("factory").populate("createdBy");
     console.log(reports);
     if (reports.length === 0) {
       return res.status(404).send("No reports found");
@@ -237,13 +277,13 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
     const writeStream = fs.createWriteStream(tempFilePath);
     doc.pipe(writeStream);
 
-    // Add title
-    doc.fontSize(18).text("Reports Table", { align: "center" });
+    // Add title with factory name
+    const factoryName = factory ? reports[0].factory?.name || "Factory" : "All factories";
+    doc.fontSize(18).text(`Reports Table - ${factoryName}`, { align: "center" });
     doc.moveDown();
 
     // Add table headers
     doc.fontSize(12).fillColor("#000000").text("");
-
     const headers = [
       "Created By",
       "Factory",
@@ -258,7 +298,7 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
       "Comment",
     ];
 
-    const columnWidths = [70, 70, 50, 70, 70, 70, 70, 60, 50, 50, 100, 80, 80];
+    const columnWidths = [70, 70, 50, 70, 70, 70, 70, 60, 50, 50, 100];
 
     // Function to draw a table row
     const drawRow = (y, row, isHeader = false) => {
@@ -287,6 +327,10 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
 
     // Add report data as table rows
     reports.forEach((report) => {
+      if (y + 20 > doc.page.height - 30) {
+        doc.addPage();
+        y = drawRow(doc.y, headers, true);
+      }
       const row = [
         report.createdBy?.name || "",
         report.factory?.name || "",
@@ -327,9 +371,10 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
     });
   } catch (err) {
     console.error("Error generating PDF", err);
-    res.status(500).send("Error generating PDF 123");
+    res.status(500).send("Error generating PDF");
   }
 });
+
 
 module.exports = {
   addReportCtrl,

@@ -137,15 +137,16 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
-  const userId = req.user._id;
-
+  const {id} = req.user;
+  console.log("hello");
   try {
-    const loggedInUser = await User.findById(userId).select(
+    const loggedInUser = await User.findById(id).select(
       "-password -accessToken"
     );
-    return res.json({ message: "ok", data: loggedInUser });
+    return res.json({success:true, message: "ok", data: loggedInUser });
   } catch (err) {
-    return res.json({ message: "Invalid Credentials", err });
+    console.log(err);
+    return res.json({success:false, message: "Invalid Credentials", err });
   }
 });
 
@@ -484,6 +485,33 @@ const userDetailsCtrl = expressAsyncHandler(async (req, res) => {
   }
 });
 
+
+//-------------------------------
+// Switch Language
+//-------------------------------
+
+const switchLanguageCtrl = expressAsyncHandler(async (req, res) => {
+ 
+  const {id} = req.user
+  const {language} = req.body
+console.log("hello");
+  try {
+    const user = await User.findByIdAndUpdate(id,{language},{new:true}).select(
+      "-password -accessToken"
+    );
+    console.log(user);
+    res.json({
+      success: true,
+      data: {
+        user: user,
+        message: "Fetched",
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({success:false, message: "Employee Fetch Fail", err });
+  }
+});
 const userEditCtrl = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, email, factory, role } = req.body;
@@ -545,41 +573,30 @@ const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
     .json({ message: "User logged Out" });
 });
 
-const changePassword = expressAsyncHandler(async (req, res) => {
-  const { id } = req.user;
-  const { oldPassword, newPassword, conformPassword } = req.body;
-
+const changePassword =  expressAsyncHandler(async(req,res)=>{
+  const {_id} = req.user
+  console.log(_id);
+  const {password} = req.body;
+  if (!password) {
+    throw new Error("Both Password should be same!")
+  }
   try {
-    if (newPassword === conformPassword) {
-      throw new Error("Conform Password Doesnt match ");
-    }
-
-    const user = await User.findById(id);
-    const isPasswordValid = await user.isPasswordMatched(oldPassword);
-
-    if (!isPasswordValid) {
-      throw new Error("Write correct Password");
-    }
-    const updatedUser = await User.findByIdAndUpdate(id, {
-      password: newPassword,
-    });
-
+    const user = await User.findById(_id);
+    user.password = password;
+    user.firstLogin = false;
+    await user.save()
     res.json({
       success: true,
       message: "Password Updated",
-      data: {
-        users: updatedUser,
-      },
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "Password update Fail",
-      error,
+    res.json({
+      success: false,
+      message: "Unable to Update Password",
     });
   }
-});
-
+})
 function getFormattedDate() {
   const now = moment();
   const hour = now.hour();
@@ -607,4 +624,5 @@ module.exports = {
   userDetailsCtrl,
   userEditCtrl,
   changePassword,
+  switchLanguageCtrl
 };

@@ -5,7 +5,9 @@ import {
   WorkerRoute,
   AdminRoute,
   UserRoute,
+  CheckFirstLoginRoute,
 } from "./routes/index";
+import ChangePassword from "./pages/ChangePassword";
 
 const Home = lazy(() => import("./pages/Home"));
 
@@ -34,9 +36,13 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Home />} />
         </Route>
+        {/* ------------ Public Routes ------------*/}{" "}
+        <Route element={<CheckFirstLoginRoute />}>
+          <Route path="/change-password" element={<ChangePassword />} />
+        </Route>
         {/* ------------ Workers Routes ------------*/}{" "}
         <Route element={<WorkerRoute />}>
-          <Route path="/dayil-report-update" element={<DailyReportUpdate />} />
+          <Route path="/daily-report-update" element={<DailyReportUpdate />} />
         </Route>
         {/* ------------ Users Routes ------------*/}{" "}
         <Route element={<UserRoute />}>

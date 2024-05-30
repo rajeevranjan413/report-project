@@ -1,126 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { Space, Table, Tag, ConfigProvider } from 'antd';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  Space,
+  Table,
+  Modal,
+  ConfigProvider,
+  Button,
+  Upload,
+  message,
+} from "antd";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
-const columns = [
-    // {
-    //     title: 'Created',
-    //     dataIndex: 'createdBy',
-    //     key: 'name',
+import { FaRegEdit, FaUpload } from "react-icons/fa";
+import axios from "axios";
 
-    // },
-    {
-        title: 'Area',
-        dataIndex: 'area',
-        key: 'area',
-
-    },
-    {
-        title: 'Topic',
-        dataIndex: 'topic',
-        key: 'topic',
-    },
-    {
-        title: 'Chemical Used',
-        dataIndex: 'chemical',
-        key: 'address',
-    },
-    {
-        title: 'Prepared Premise',
-        dataIndex: 'premise',
-        key: 'address',
-    },
-    {
-        title: 'Water Tempature',
-        dataIndex: 'tempature',
-        key: 'address',
-    },
-    {
-        title: 'Job Rating',
-        dataIndex: 'rating',
-        key: 'address',
-    },
-    {
-        title: 'ATP Result',
-        dataIndex: 'test',
-        key: 'address',
-    },
-    {
-        title: 'Comment',
-        dataIndex: 'comment',
-        key: 'address',
-    },
-    {
-        title: 'Photos',
-        dataIndex: 'photo',
-        key: 'address',
-    },
-    // {
-    //     title: 'Prepared Premise',
-    //     key: 'tags',
-    //     dataIndex: 'tags',
-    //     render: (_, { tags }) => (
-    //         <>
-    //             {tags.map((tag) => {
-    //                 let color = tag.length > 5 ? 'geekblue' : 'green';
-    //                 if (tag === 'loser') {
-    //                     color = 'volcano';
-    //                 }
-    //                 return (
-    //                     <Tag color={color} key={tag}>
-    //                         {tag.toUpperCase()}
-    //                     </Tag>
-    //                 );
-    //             })}
-    //         </>
-    //     ),
-    // },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                {/* {record.name} */}
-                <a><FaRegEdit /></a>
-                <a><MdOutlineDeleteOutline /></a>
-            </Space>
-        ),
-    },
+const columns = (handleViewImage, handleDeleteImage, handleUploadImage) => [
+  {
+    title: "Area",
+    dataIndex: "area",
+    key: "area",
+  },
+  {
+    title: "Topic",
+    dataIndex: "topic",
+    key: "topic",
+  },
+  {
+    title: "Chemical Used",
+    dataIndex: "chemical",
+    key: "chemical",
+  },
+  {
+    title: "Prepared Premise",
+    dataIndex: "premise",
+    key: "premise",
+  },
+  {
+    title: "Water Tempature",
+    dataIndex: "tempature",
+    key: "tempature",
+  },
+  {
+    title: "Job Rating",
+    dataIndex: "rating",
+    key: "rating",
+  },
+  {
+    title: "ATP Result",
+    dataIndex: "test",
+    key: "test",
+  },
+  {
+    title: "Comment",
+    dataIndex: "comment",
+    key: "comment",
+  },
+  {
+    title: "Photos",
+    dataIndex: "photo",
+    key: "photo",
+    render: (_, { photo }) => (
+      <>
+        <Button onClick={() => handleViewImage(photo[0])}>View Image</Button>
+      </>
+    ),
+  },
+  {
+    title: "Action",
+    key: "action",
+    render: (_, record) => (
+      <Space size="middle">
+        <a onClick={() => handleEdit(record)}>
+          <FaRegEdit />
+        </a>
+        <a onClick={() => handleDelete(record)}>
+          <MdOutlineDeleteOutline />
+        </a>
+      </Space>
+    ),
+  },
 ];
 
 const TodayReportTable = () => {
+  const [reports, setAllReports] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
-    const [reports, setAllReports] = useState([]);
+  useEffect(() => {
+    const getResponse = async () => {
+      const { data } = await axios.get(
+        "http://localhost:8000/api/report/todayReport",
+        { withCredentials: true }
+      );
+      setAllReports(data.data);
+    };
 
+    getResponse();
+  }, []);
 
+  const handleViewImage = (photos) => {
+    setSelectedImages(photos);
+    setIsModalVisible(true);
+  };
 
-    useEffect(() => {
-        const getRespose = async () => {
-            const { data } = await axios.get("http://localhost:8000/api/report/todayReport", { withCredentials: true })
-            // console.log(data)
-            setAllReports(data.data)
-        }
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedImages([]);
+  };
 
-        getRespose()
+  const handleDeleteImage = (index) => {
+    const updatedImages = [...selectedImages];
+    updatedImages.splice(index, 1);
+    console.log("Hellllloooo", updatedImages);
 
+    setSelectedImages(updatedImages);
+  };
 
-    }, [])
+  const handleUploadImage = async (info) => {
+    if (info.file.status === "uploading") {
+      setUploading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      // You can handle response from server after successful upload
+      message.success(`${info.file.name} file uploaded successfully.`);
+      setUploading(false);
+    }
+  };
 
-    // console.log(reports[0])
-    return (
-        <ConfigProvider
-            theme={{
-                components: {
-                    Table: {
-                        /* here is your component tokens */
-                        headerBg: "white"
-                    },
-                },
-            }}
+  return (
+    <>
+      <ConfigProvider
+        theme={{
+          components: {
+            Table: {
+              headerBg: "white",
+            },
+          },
+        }}
+      >
+        <Table
+          columns={columns(
+            handleViewImage,
+            handleDeleteImage,
+            handleUploadImage
+          )}
+          dataSource={reports}
+        />
+      </ConfigProvider>
+
+      <Modal
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+        centered
+        width={600}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "20px",
+          }}
         >
-            <Table columns={columns} dataSource={reports} />
-        </ConfigProvider>
-    );
-}
+          <Upload
+            accept="image/*"
+            showUploadList={false}
+            beforeUpload={() => false}
+            onChange={handleUploadImage}
+          >
+            <Button icon={<FaUpload />} loading={uploading}>
+              Upload Image
+            </Button>
+          </Upload>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {selectedImages.length > 0 ? (
+            selectedImages.map((image, index) => (
+              <div key={index} style={{ margin: "10px", position: "relative" }}>
+                <img
+                  src={image}
+                  alt={`Report Image ${index}`}
+                  style={{ width: "70px", height: "70px" }}
+                />
+                <Button
+                  type="danger"
+                  icon={<MdOutlineDeleteOutline />}
+                  size="small"
+                  style={{ position: "sticky", top: "-25px", right: "-25px" }}
+                  onClick={() => handleDeleteImage(index)}
+                />
+              </div>
+            ))
+          ) : (
+            <p>No images to display</p>
+          )}
+        </div>
+      </Modal>
+    </>
+  );
+};
+
 export default TodayReportTable;

@@ -7,6 +7,7 @@ const EditUserModal = ({
   handleCancel,
   userData,
   factoryData,
+  text
 }) => {
   console.log(userData);
   const [role, setRole] = useState(userData?.role);
@@ -30,15 +31,16 @@ const EditUserModal = ({
   return (
     <Modal
       centered
-      okText="Save"
-      title="Edit User"
+      okText={text.save}
+      title={text.edit}
       open={isModalOpen}
       onOk={() => handleOk({ role, factory, name })}
       onCancel={handleCancel}
+      cancelText={text.cancel}
     >
       <div className="mt-4 grid gap-2">
         <div className="flex flex-col gap-1">
-          <label htmlFor="role">Role</label>
+          <label htmlFor="role">{text.role}</label>
           <Select
             value={role}
             style={{ width: 120 }}
@@ -52,7 +54,7 @@ const EditUserModal = ({
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="factory">Factory</label>
+          <label htmlFor="factory">{text.factory}</label>
           <Select
             value={factory}
             style={{ width: 120 }}
@@ -66,7 +68,7 @@ const EditUserModal = ({
           </Select>
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">{text.factory}</label>
           <Input
             type="text"
             id="name"

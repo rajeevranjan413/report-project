@@ -8,8 +8,35 @@ import FactoryTable from "../../components/admin/FactoryTable";
 import { FaRegEdit } from "react-icons/fa";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import EditFactoryModal from "../../components/admin/EditFctoryModel";
+import { useSelector } from "react-redux";
 
 const { Search } = Input;
+const translations = {
+  eng: {
+    factories: "Factories",
+    createNewFactory: "Create New Factory",
+    searchFactoryName: "Search Factory Name",
+    name: "Name",
+    areas: "Areas",
+    action: "Action",
+    edit: "Edit",
+    delete: "Delete",
+    create: "Create",
+    addArea:"Add Area"
+    },
+  lit: {
+    factories: "Gamyklos", // Lithuanian translation for Factories
+    createNewFactory: "Sukurti naują fabriką", // Lithuanian translation for Create New Factory
+    searchFactoryName: "Ieškoti fabriko pavadinimo", // Lithuanian translation for Search Factory Name
+    name: "Pavadinimas", // Lithuanian translation for Name
+    areas: "Zonos", // Lithuanian translation for Areas
+    action: "Veiksmas", // Lithuanian translation for Action
+    edit: "Redaguoti", // Lithuanian translation for Edit
+    delete: "Ištrinti", // Lithuanian translation for Delete
+    create: "Sukurti", // Lithuanian translation for Create
+    addArea:"Pridėti sritį"
+  },
+};
 
 const AdminFactory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,7 +51,8 @@ const AdminFactory = () => {
   const [factoryForEdit, setFactoryForEdit] = useState(null);
   const [editModelOpen, setEditModelOpen] = useState(null);
   const [factoryId, setFactoryId] = useState(null);
-
+  const { userAuth } = useSelector((store) => store?.system);
+  const currentText = translations[userAuth?.language || "eng"];
   useEffect(() => {
     async function getFactoryList(search, offset, limit) {
       try {
@@ -120,9 +148,7 @@ const AdminFactory = () => {
 
   useEffect(() => {
     const getFactoryDetails = async () => {
-      console.log(factoryId);
-      // setEditModelOpen(true); // Open the edit modal once the user data is fetched
-
+      console.log(factoryId); // setEditModelOpen(true); // Open the edit modal once the user data is fetched
       try {
         const { data } = await axios.get(
           `http://localhost:8000/api/factory/details/${factoryId}`,
@@ -169,43 +195,48 @@ const AdminFactory = () => {
 
   return (
     <div>
-      <ToastContainer />
+            <ToastContainer />     {" "}
       <div className="flex justify-between p-4 mt-4 mb-6">
-        <h1 className="text-xl font-bold">Factories</h1>
+                <h1 className="text-xl font-bold">{currentText.factories}</h1>       {" "}
         <Button
           style={{ display: "flex", alignItems: "center", gap: "4px" }}
           type="primary"
           onClick={showModal}
         >
-          <IoIosAddCircle />
-          Create New Factory
+        <IoIosAddCircle />{currentText.createNewFactory}
         </Button>
+             {" "}
       </div>
+           {" "}
       <div className="mb-2">
+               {" "}
         <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-          <h5>Factories</h5>
+                    <h5>{currentText.factories}</h5>
+                   {" "}
           <Search
-            placeholder="Search Factory Name"
+            placeholder={currentText.searchFactoryName}
             onSearch={onSearch}
             style={{
               width: 200,
             }}
           />
+                 {" "}
         </div>
+               {" "}
         <FactoryTable
           columns={[
             {
-              title: "Name",
+              title: currentText.name,
               dataIndex: "name",
               key: "name",
             },
             {
-              title: "Areas",
+              title: currentText.areas,
               dataIndex: "areas",
               render: (item) => item.map((i, k) => <p key={k}>{i}</p>),
             },
             {
-              title: "Action",
+              title: currentText.action,
               render: (item) => (
                 <div>
                   <button
@@ -214,11 +245,12 @@ const AdminFactory = () => {
                       setFactoryId(item._id);
                     }}
                   >
-                    <FaRegEdit />
+                  <FaRegEdit />{" "}
                   </button>{" "}
                   <button onClick={() => handleDelete(item._id)}>
-                    <MdOutlineDeleteOutline />
+                     <MdOutlineDeleteOutline />
                   </button>
+                 {" "}
                 </div>
               ),
             },
@@ -226,20 +258,25 @@ const AdminFactory = () => {
           data={factoryData || []}
           pageSize={10}
         />
+             {" "}
       </div>
-
+           {" "}
       <div>
+               {" "}
         <Modal
           centered={true}
-          okText="Create"
-          title="Create New Factory"
+          okText={currentText.create}
+          title={currentText.createNewFactory}
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
         >
+                   {" "}
           <div className="mt-4 grid gap-2">
+                       {" "}
             <div className="flex flex-col gap-1">
-              <label htmlFor="name">Name</label>
+                            <label htmlFor="name">{currentText.name}</label>
+                           {" "}
               <input
                 className="p-2 border outline-none rounded"
                 type="text"
@@ -248,11 +285,16 @@ const AdminFactory = () => {
                 value={name}
                 onChange={(ev) => setName(ev.target.value)}
               />
+                         {" "}
             </div>
+                     {" "}
           </div>
+                   {" "}
           <Form layout="inline">
+                       {" "}
             {fields.map((field, index) => (
               <Form.Item key={index} label={`Area ${index + 1}`}>
+                               {" "}
                 <Input
                   value={field.value}
                   onChange={(e) =>
@@ -263,26 +305,36 @@ const AdminFactory = () => {
                     )
                   }
                 />
-                <Button onClick={() => handleRemoveInput(index)}>Remove</Button>
+                               {" "}
+                <Button type="primary" onClick={() => handleRemoveInput(index)}>{currentText.delete}</Button>
+                             {" "}
               </Form.Item>
             ))}
+            
             <Form.Item>
+                           {" "}
               <Button type="primary" onClick={handleAddInput}>
-                Add Area
+              {currentText.addArea}
               </Button>
+                         {" "}
             </Form.Item>
+                     {" "}
           </Form>
+                 {" "}
         </Modal>
+             {" "}
       </div>
-
+           {" "}
       {factoryForEdit && (
         <EditFactoryModal
+        currentText= {currentText}
           isModalOpen={editModelOpen}
           handleOk={handleEditOk}
           handleCancel={handleCancel}
           factoryData={factoryForEdit}
         />
       )}
+         {" "}
     </div>
   );
 };

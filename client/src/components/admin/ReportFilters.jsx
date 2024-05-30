@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function ReportFilters({ setFilter }) {
+export default function ReportFilters({ t,setFilter }) {
   const [factoryData, setFactoryData] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null); // State for selected topic
@@ -49,9 +49,9 @@ export default function ReportFilters({ setFilter }) {
             value={selectedFactory}
             style={{ width: 120 }}
             onChange={(value) => setSelectedFactory(value)}
-            placeholder={"Select Factory"}
+            placeholder={t.sf}
           >
-            <Select.Option value={""}>All Factories</Select.Option>
+            <Select.Option value={""}>{t.af}</Select.Option>
             {factoryData.map((factory) => (
               <Select.Option key={factory._id} value={factory._id}>
                 {factory.name}
@@ -71,10 +71,10 @@ export default function ReportFilters({ setFilter }) {
             value={selectedTopic}
             style={{ width: 120 }}
             onChange={(value) => setSelectedTopic(value)}
-            placeholder={"Select Topic"}
+            placeholder={t.topic}
           >
             {" "}
-            <Select.Option value={""}>All Topics</Select.Option>
+            <Select.Option value={""}>{t.at}</Select.Option>
             {/* Assuming topics are hardcoded or fetched similarly to factories */}
             <Select.Option value={"Before Work"}>Before Work</Select.Option>
             <Select.Option value={"After Work"}>After Work</Select.Option>

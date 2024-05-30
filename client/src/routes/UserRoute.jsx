@@ -1,14 +1,20 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import Header from '../components/layout/Header'
+import { Navigate, Outlet } from 'react-router-dom';
+import Header from '../components/layout/Header';
+import { useSelector } from 'react-redux';
 
-const UserRoute = () => {
-    return (
-        <main className='mx-auto max-w-[1200px]'>
-            <Header />
-            <Outlet />
-        </main>
-    )
-}
+const WorkerRoute = () => {
+  const { userAuth } = useSelector((store) => store?.system);
 
-export default UserRoute
+  if (userAuth?.role !== 'User') {
+    return <Navigate to="/login" />;
+  }
+
+  return (
+    <main className='mx-auto max-w-[1200px]'>
+      <Header />
+      <Outlet />
+    </main>
+  );
+};
+
+export default WorkerRoute;
