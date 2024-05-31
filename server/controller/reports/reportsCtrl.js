@@ -12,17 +12,24 @@ require("pdfkit-table");
 //-----------------------------------------
 const addReportCtrl = expressAsyncHandler(async (req, res) => {
   const { _id, factory } = req.user;
-  const { report } = req.body;
+  console.log("Hello From File", req.files, req.files);
   const files = req.files ? req.files : [];
   const photosUrls = [];
+
   for (const file of files) {
     const { path } = file;
     const url = await cloudinaryUploadImg(path);
-
-    photosUrls.push(url);
+    console.log(url.url);
+    photosUrls.push(url.url);
   }
-  console.log(photosUrls);
-  console.log(report);
+
+  console.log("Hello from Image", photosUrls);
+  console.log("Hello From req.body", req.body);
+
+  // Assuming req.body contains the 'report' object directly
+  const report = JSON.parse(req.body.report);
+
+  console.log("Parsed Report", report);
 
   try {
     const addedReport = await Report.create({
@@ -30,13 +37,12 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
       factory: factory,
       area: report.area,
       topic: report.topic,
-      problem: report.problem ? report.problem : "",
-      chemical: report.chemical ? report.chemical : "",
-      premise: report.premise ? report.premise : "",
-      tempature: report.tempature ? report.tempature : "",
-      rating: report.rating ? report.rating : "",
-      test: report.test ? report.test : "",
-      comment: report.comment ? report.comment : "",
+      chemical: report.chemical || "",
+      premise: report.premise || "",
+      tempature: report.tempature || "",
+      rating: report.rating || "",
+      test: report.test || "",
+      comment: report.comment || "",
       photo: photosUrls.length > 0 ? photosUrls : [],
     });
     return res.json({
@@ -44,6 +50,7 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
       data: addedReport,
     });
   } catch (err) {
+    console.log(err);
     return res.json({
       message: "Something went wrong while adding the report",
       data: err.message,
@@ -65,6 +72,24 @@ const deleteReportCtrl = expressAsyncHandler(async (req, res) => {
     });
   } catch (error) {
     return res.json({
+      message: "Something went wrong while Deleting the report",
+      data: error,
+    });
+  }
+});
+
+const individualReportCtrl = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedReport = await Report.findById(id).populate("factory");
+    return res.json({
+      success: true,
+      message: `Report Fetch Successfully`,
+      data: deletedReport,
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
       message: "Something went wrong while Deleting the report",
       data: error,
     });
@@ -259,7 +284,9 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
     }
 
     // Fetch reports based on the constructed query
-    const reports = await Report.find(query).populate("factory").populate("createdBy");
+    const reports = await Report.find(query)
+      .populate("factory")
+      .populate("createdBy");
     console.log(reports);
     if (reports.length === 0) {
       return res.status(404).send("No reports found");
@@ -278,8 +305,12 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
     doc.pipe(writeStream);
 
     // Add title with factory name
-    const factoryName = factory ? reports[0].factory?.name || "Factory" : "All factories";
-    doc.fontSize(18).text(`Reports Table - ${factoryName}`, { align: "center" });
+    const factoryName = factory
+      ? reports[0].factory?.name || "Factory"
+      : "All factories";
+    doc
+      .fontSize(18)
+      .text(`Reports Table - ${factoryName}`, { align: "center" });
     doc.moveDown();
 
     // Add table headers
@@ -375,7 +406,6 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
 module.exports = {
   addReportCtrl,
   deleteReportCtrl,
@@ -383,4 +413,5 @@ module.exports = {
   getTodaysReportsCtrl,
   getReportListForAdminCtrl,
   downloadReport,
+  individualReportCtrl,
 };

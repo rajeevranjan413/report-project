@@ -13,13 +13,11 @@ const reportSchema = new mongoose.Schema(
     },
     area: {
       type: String,
-      enum: ["Area 1", "Area 2", "Area 3", "Area 4"],
-      required: true,
     },
 
     topic: {
       type: String,
-      enum: ["Before Work", "After Work", "Complain", "With Chemical"],
+      enum: ["Before Work", "After Work", "Complain", "Chemical Applied"],
       required: true,
     },
     problem: {
