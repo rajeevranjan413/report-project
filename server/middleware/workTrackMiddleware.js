@@ -1,13 +1,14 @@
 const expressAsyncHandler = require("express-async-handler");
 const moment = require("moment-timezone");
 const WorkTrack = require("../model/WorkTrack/WorkTrack");
+const getCurrentTimeInLithuania = require("../utils/getCurrentTimeInLithunia");
 
 const workTrackMiddleware = expressAsyncHandler(async (req, res, next) => {
   try {
     const { id } = req.user;
 
-    const currentTime = moment().tz("Europe/Vilnius");
-
+    const currentTime = getCurrentTimeInLithuania();
+    console.log(currentTime);
     await WorkTrack.findOneAndUpdate(
       {
         worker: id,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const ReportData = ({ name, label, type, options, setTopic }) => {
+const ReportData = ({ name, label, type, options, setTopic, error }) => {
   const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
@@ -15,7 +15,7 @@ const ReportData = ({ name, label, type, options, setTopic }) => {
     >
       {label && (
         <label className="text-center w-full text-wrap" htmlFor={name}>
-          {label}{" "}
+          {label}
         </label>
       )}
       {type === "select" ? (
@@ -55,6 +55,7 @@ const ReportData = ({ name, label, type, options, setTopic }) => {
           onChange={(e) => setInputValue(e.target.value)}
         />
       )}
+      {error && <span className="text-red-500 text-sm">{error}</span>}
     </div>
   );
 };

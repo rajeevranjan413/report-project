@@ -4,14 +4,18 @@ const cloudinaryUploadImg = require("../../utils/cloudinary");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
+const moment = require("moment-timezone");
+
 const { default: mongoose } = require("mongoose");
 const temp = require("temp");
+const getCurrentTimeInLithuania = require("../../utils/getCurrentTimeInLithunia");
+const WorkTrack = require("../../model/WorkTrack/WorkTrack");
 require("pdfkit-table");
 //-----------------------------------------
 // Add Report Ctrl
 //-----------------------------------------
 const addReportCtrl = expressAsyncHandler(async (req, res) => {
-  const { _id, factory } = req.user;
+  const { _id, factory, role } = req.user;
   console.log("Hello From File", req.files, req.files);
   const files = req.files ? req.files : [];
   const photosUrls = [];
@@ -45,6 +49,17 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
       comment: report.comment || "",
       photo: photosUrls.length > 0 ? photosUrls : [],
     });
+    if (role == "Worker") {
+      const currentTime = getCurrentTimeInLithuania();
+      console.log(currentTime);
+      await WorkTrack.findOneAndUpdate(
+        {
+          worker: _id,
+          dateString: getFormattedDate(),
+        },
+        { checkedOut: currentTime }
+      );
+    }
     return res.json({
       message: `Report added Successfully`,
       data: addedReport,
@@ -57,7 +72,19 @@ const addReportCtrl = expressAsyncHandler(async (req, res) => {
     });
   }
 });
+function getFormattedDate() {
+  const now = moment();
+  const hour = now.hour();
 
+  // Check if time is between 00:00 and 6:00
+  if (hour >= 0 && hour < 6) {
+    // Use subtract to get the previous day's date
+    return now.subtract(1, "days").format("YYYY-MM-DD");
+  } else {
+    // Use current date
+    return now.format("YYYY-MM-DD");
+  }
+}
 //-------------------------------
 // Delete User Ctrl
 //-------------------------------
@@ -188,17 +215,44 @@ const uploadImages = expressAsyncHandler(async (req, res) => {
 
 const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
   const { _id } = req.user;
-
   try {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    const currentTime = moment().tz("Europe/Vilnius");
 
-    // Query for reports with timestamp between start and end of today
+    let startOfDay, endOfDay;
+
+    if (currentTime.hour() >= 18) {
+      // If current time is between 18:00 and 23:59:59
+      startOfDay = currentTime
+        .clone()
+        .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+      endOfDay = currentTime
+        .clone()
+        .add(1, "day")
+        .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+    } else if (currentTime.hour() <= 6) {
+      // If current time is between 00:00 and 6:00
+      startOfDay = currentTime
+        .clone()
+        .subtract(1, "day")
+        .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+      endOfDay = currentTime
+        .clone()
+        .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+    } else {
+      // If current time is between 6:01 and 17:59:59, use today's range from 21:00 to 09:00 next day
+      startOfDay = currentTime
+        .clone()
+        .subtract(1, "day")
+        .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+      endOfDay = currentTime
+        .clone()
+        .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+    }
+
+    // Query for reports with timestamp between start and end of the specified time range
     const todaysReports = await Report.find({
       createdBy: new mongoose.Types.ObjectId(_id),
-      createdAt: { $gte: startOfDay, $lte: endOfDay },
+      createdAt: { $gte: startOfDay.toDate(), $lte: endOfDay.toDate() },
     });
 
     return res.json({
@@ -206,6 +260,7 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
       data: todaysReports,
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       message: "Something went wrong while fetching today's reports",
       error: err,
@@ -214,39 +269,62 @@ const getTodaysReportsCtrl = expressAsyncHandler(async (req, res) => {
 });
 
 const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
+  function areDatesEqual(date1, date2) {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  }
+
   try {
     let startDate, endDate;
-    const { date: date, factory, topic } = req.query;
-    // If start date and end date are provided, parse them
+    const { date, factory, topic } = req.query;
+    const currentTime = moment().tz("Europe/Vilnius");
+
     if (date) {
-      startDate = new Date(date[0]);
-      endDate = new Date(date[1]);
+      startDate = moment(date[0]).tz("Europe/Vilnius");
+      endDate = moment(date[1]).tz("Europe/Vilnius");
+
+      if (areDatesEqual(startDate.toDate(), endDate.toDate())) {
+        console.log("helllo equal dates");
+        startDate.set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+        endDate = startDate
+          .clone()
+          .add(1, "day")
+          .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+      }
     } else {
-      // Default to today's date if start date and end date are not provided
-      const today = new Date();
-      startDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        0,
-        0,
-        0,
-        0
-      );
-      endDate = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        23,
-        59,
-        59,
-        999
-      );
+      if (currentTime.hour() >= 18) {
+        startDate = currentTime
+          .clone()
+          .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+        endDate = currentTime
+          .clone()
+          .add(1, "day")
+          .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+      } else if (currentTime.hour() <= 6) {
+        startDate = currentTime
+          .clone()
+          .subtract(1, "day")
+          .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+        endDate = currentTime
+          .clone()
+          .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+      } else {
+        startDate = currentTime
+          .clone()
+          .subtract(1, "day")
+          .set({ hour: 21, minute: 0, second: 0, millisecond: 0 });
+        endDate = currentTime
+          .clone()
+          .set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+      }
     }
 
     // Construct query based on start date, end date, factory ID, and topic
     const query = {
-      createdAt: { $gte: startDate, $lte: endDate },
+      createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() },
     };
 
     if (factory) {
@@ -258,7 +336,10 @@ const getReportListForAdminCtrl = expressAsyncHandler(async (req, res) => {
     }
 
     // Fetch reports based on the constructed query
-    const reports = await Report.find(query);
+    const reports = await Report.find(query).populate({
+      path: "createdBy",
+      select: "name",
+    });
 
     return res.json({
       message: "Reports fetched successfully",

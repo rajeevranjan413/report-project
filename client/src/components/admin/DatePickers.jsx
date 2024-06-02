@@ -1,4 +1,3 @@
-import React from "react";
 import { DatePicker, Space, ConfigProvider } from "antd";
 
 const { RangePicker } = DatePicker;
@@ -8,11 +7,11 @@ const DatePickers = ({ onChange }) => (
     theme={{
       components: {
         DatePicker: {
-          style: { width: "100%" }, // Ensure date picker occupies full width
+          style: { width: "100%" },
         },
       },
       space: {
-        size: 8, // Set default space size
+        size: 8,
       },
     }}
   >
@@ -21,12 +20,13 @@ const DatePickers = ({ onChange }) => (
         style={{ width: "100%" }}
         onChange={onChange}
         format="YYYY-MM-DD"
-        dropdownClassName="compact-datepicker" // Custom class for compact styling
+        dropdownClassName="compact-datepicker"
         popupStyle={{
-          width: "100%", // Ensure popup takes full width
-          maxWidth: "300px", // Limit popup width on small screens
+          width: "100%",
+          maxWidth: "300px",
         }}
-        picker="date" // Set picker to date to show only date picker on small screens
+        picker="date"
+        className="w-full md:max-w-xs"
       />
     </Space>
   </ConfigProvider>

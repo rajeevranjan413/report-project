@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     login: {
       type: String,
@@ -32,15 +33,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    firstLogin:{
+    firstLogin: {
       type: Boolean,
-      default:true
+      default: true,
     },
-    language:{
+    language: {
       type: String,
-      enum:["eng","lit"],
-      default:"eng"
-    }
+      enum: ["eng", "lit"],
+      default: "eng",
+    },
   },
   { timestamps: true }
 );
@@ -61,20 +62,26 @@ userSchema.methods.isPasswordMatched = async function (enteredPassword) {
 };
 
 userSchema.methods.generateAccessToken = async function () {
-  const currentTime = moment().tz("Europe/Vilnius").add(3, "hour");
-  if (this.role === "") {
-    const loginWindowStart = currentTime
-      .clone()
-      .set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
-    const loginWindowEnd = loginWindowStart
-      .clone()
-      .add(1, "days")
-      .set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
-    console.log(loginWindowEnd.toDate());
-
-    // Adjust the login window start to previous day if current time is between 00:00 and 06:00
+  const currentTime = moment().tz("Europe/Vilnius");
+  if (this.role === "Worker") {
+    let loginWindowStart;
+    let loginWindowEnd;
     if (currentTime.hour() < 6) {
-      loginWindowStart.subtract(1, "days");
+      loginWindowStart = currentTime
+        .clone()
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+      loginWindowEnd = loginWindowStart
+        .clone()
+        .set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+    } else {
+      loginWindowStart = currentTime
+        .clone()
+        .set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
+      loginWindowEnd = loginWindowStart
+        .clone()
+        .add(1, "days")
+        .set({ hour: 6, minute: 0, second: 0, millisecond: 0 });
+      console.log(currentTime.hour());
     }
 
     const isWithinLoginWindow = currentTime.isBetween(

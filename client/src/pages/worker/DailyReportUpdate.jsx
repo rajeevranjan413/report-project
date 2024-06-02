@@ -19,6 +19,7 @@ const translations = {
     photos: "Photos",
     reports: "Reports",
     action: "Action",
+    problemType: "Problem Type",
     dr: "Download Report",
     sf: "Select Factory",
     af: "All Factories",
@@ -29,7 +30,7 @@ const translations = {
   lit: {
     area: "Vieta",
     topic: "Tema",
-    chemicalUsed: "Naudotos cheminės medžiagos",
+    chemicalUsed: "Naudotos cheminės",
     preparedPremise: "Paruoštos patalpos",
     waterTemperature: "Vandens temperatūra",
     jobRating: "Darbo įvertinimas",
@@ -44,12 +45,13 @@ const translations = {
     at: "Visos temos",
     title: "Jūsų šiandienos ataskaitos",
     newReport: "Nauja ataskaita",
+    problemType: "Problemos tipas",
   },
 };
 const DailyReportUpdate = () => {
   const [newReport, setNewReport] = useState(false);
   const [area, setArea] = useState([]);
-
+  const [refresh, setRefresh] = useState(false);
   const { userAuth } = useSelector((store) => store?.system);
   const currentText = translations[userAuth?.language];
 
@@ -96,11 +98,16 @@ const DailyReportUpdate = () => {
           newReport ? " visible" : " hidden"
         } px-2 mt-3 mb-9 w-full border bg-white rounded`}
       >
-        <NewReportCard area={area} setVisible={setNewReport} />
+        <NewReportCard
+          refresh={setRefresh}
+          area={area}
+          text={currentText}
+          setVisible={setNewReport}
+        />
       </div>
       <div>
         {/* <ReportsContainer /> */}
-        <TodayReportTable currentText={currentText} />
+        <TodayReportTable refresh={refresh} currentText={currentText} />
       </div>
 
       <div></div>

@@ -85,10 +85,10 @@ const AdminTable = ({ text, openModel, selected, set }) => {
               dataIndex: "email",
               key: "email",
             },
-            {
-              title: `${text.factory}`,
-              render: (item) => <p>{item?.factory ?? "-"}</p>,
-            },
+            // {
+            //   title: `${text.factory}`,
+            //   render: (item) => <p>{item?.factory ?? "-"}</p>,
+            // },
             {
               title: `${text.action}`,
               render: (item) => (

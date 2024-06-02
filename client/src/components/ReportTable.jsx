@@ -1,25 +1,52 @@
-import { Table, ConfigProvider, Button, Popconfirm, Image, Modal } from "antd";
+import { Table, ConfigProvider, Button, Image, Modal } from "antd";
 import { useState } from "react";
-import { MdOutlineDeleteOutline } from "react-icons/md";
 
 const ReportTable = ({ t, data }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedReport, setSelectedReport] = useState(null);
+  const [selectedText, setSelectedText] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const handleViewImage = (photos, record) => {
-    setSelectedImages(photos || []);
-    setSelectedReport(record);
+
+  const handleViewText = (text) => {
+    setSelectedText(text);
     setIsModalVisible(true);
   };
+
+  const handleViewImage = (photos, record) => {
+    setSelectedImages(photos || []);
+    setSelectedText(null);
+    setIsModalVisible(true);
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
+    setSelectedText("");
     setSelectedImages([]);
   };
+
+  const renderTextWithModal = (text) => {
+    const words = text.split(" ");
+    const shortText = words.slice(0, 5).join(" ");
+    const isLongText = words.length > 20;
+
+    return (
+      <div onClick={() => handleViewText(text)} style={{ cursor: "pointer" }}>
+        {shortText}
+        {isLongText && "..."}
+      </div>
+    );
+  };
+
   const columns = [
     {
       title: t.area,
       dataIndex: "area",
       key: "area",
+    },
+    {
+      title: `${"Name"}`,
+      dataIndex: "photo",
+      key: "photo",
+      render: (_, record) => <p>{record?.createdBy?.name}</p>,
     },
     {
       title: t.topic,
@@ -38,8 +65,8 @@ const ReportTable = ({ t, data }) => {
     },
     {
       title: t.waterTemperature,
-      dataIndex: "tempature",
-      key: "tempature",
+      dataIndex: "temperature",
+      key: "temperature",
     },
     {
       title: t.jobRating,
@@ -55,6 +82,7 @@ const ReportTable = ({ t, data }) => {
       title: t.comment,
       dataIndex: "comment",
       key: "comment",
+      render: renderTextWithModal,
     },
     {
       title: `${t?.photos}`,
@@ -94,37 +122,37 @@ const ReportTable = ({ t, data }) => {
         centered
         width={600}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "20px",
-          }}
-        ></div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {selectedImages.length > 0 ? (
-            selectedImages.map((image, index) => (
-              <div key={index} style={{ margin: "10px", position: "relative" }}>
-                <Image
-                  src={image}
-                  alt={`Report Image ${index}`}
-                  style={{ width: "70px", height: "70px" }}
-                  preview={{
-                    src: image,
-                  }}
-                />
-              </div>
-            ))
-          ) : (
-            <p>No images to display</p>
-          )}
-        </div>
+        {selectedText ? (
+          <p>{selectedText}</p>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {selectedImages.length > 0 ? (
+              selectedImages.map((image, index) => (
+                <div
+                  key={index}
+                  style={{ margin: "10px", position: "relative" }}
+                >
+                  <Image
+                    src={image}
+                    alt={`Report Image ${index}`}
+                    style={{ width: "70px", height: "70px" }}
+                    preview={{
+                      src: image,
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <p>No images to display</p>
+            )}
+          </div>
+        )}
       </Modal>
     </>
   );

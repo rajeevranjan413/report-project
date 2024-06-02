@@ -12,7 +12,18 @@ const authMiddleware = expressAsyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    } catch (error) {
+      const options = {
+        httpOnly: true,
+        secure: true,
+      };
+      return res
+        .clearCookie("accessToken", options)
+        .json({ message: "User logged Out" });
+    }
 
     const user = await User.findById(decodedToken?._id).select(
       "-password -accessToken"

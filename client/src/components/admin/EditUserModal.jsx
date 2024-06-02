@@ -7,12 +7,12 @@ const EditUserModal = ({
   handleCancel,
   userData,
   factoryData,
-  text
+  text,
 }) => {
-  console.log(userData);
   const [role, setRole] = useState(userData?.role);
   const [factory, setFactory] = useState(userData?.factory);
   const [name, setName] = useState(userData?.name);
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     setRole(userData?.role);
@@ -20,8 +20,25 @@ const EditUserModal = ({
     setName(userData?.name);
   }, [userData]);
 
+  const validateForm = () => {
+    const errors = {};
+    if (!name) errors.name = "Name is required";
+    if (!role) errors.role = "Role is required";
+    if (role === "Worker" && !factory) {
+      errors.factory = "Factory is required for Worker role";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSave = () => {
+    if (!validateForm()) return;
+    handleOk({ role, factory, name });
+  };
+
   const handleRoleChange = (value) => {
     setRole(value);
+    setFactory(""); // Reset factory when role changes
   };
 
   const handleFactoryChange = (value) => {
@@ -34,7 +51,7 @@ const EditUserModal = ({
       okText={text.save}
       title={text.edit}
       open={isModalOpen}
-      onOk={() => handleOk({ role, factory, name })}
+      onOk={handleSave}
       onCancel={handleCancel}
       cancelText={text.cancel}
     >
@@ -52,23 +69,31 @@ const EditUserModal = ({
               { value: "Manager", label: "Manager" },
             ]}
           />
+          {formErrors.role && (
+            <span className="text-red-500">{formErrors.role}</span>
+          )}
         </div>
+        {role === "Worker" && (
+          <div className="flex flex-col gap-1">
+            <label htmlFor="factory">{text.factory}</label>
+            <Select
+              value={factory}
+              style={{ width: 120 }}
+              onChange={handleFactoryChange}
+            >
+              {factoryData.map((v, i) => (
+                <Select.Option key={i} value={v._id}>
+                  {v.name}
+                </Select.Option>
+              ))}
+            </Select>
+            {formErrors.factory && (
+              <span className="text-red-500">{formErrors.factory}</span>
+            )}
+          </div>
+        )}
         <div className="flex flex-col gap-1">
-          <label htmlFor="factory">{text.factory}</label>
-          <Select
-            value={factory}
-            style={{ width: 120 }}
-            onChange={handleFactoryChange}
-          >
-            {factoryData.map((v, i) => (
-              <Select.Option key={i} value={v._id}>
-                {v.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="name">{text.factory}</label>
+          <label htmlFor="name">{text.name}</label>
           <Input
             type="text"
             id="name"
@@ -76,6 +101,9 @@ const EditUserModal = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+          {formErrors.name && (
+            <span className="text-red-500">{formErrors.name}</span>
+          )}
         </div>
       </div>
     </Modal>

@@ -43,6 +43,7 @@ const Header = ({ lang }) => {
       withCredentials: true,
     });
     if (data.message === "User logged Out") {
+      localStorage.clear();
       navigate("/");
     }
   };
@@ -56,7 +57,11 @@ const Header = ({ lang }) => {
   return (
     <div className="h-[80px] flex items-center justify-between font-bold text-xl px-4 bg-white">
       <Link to="/">
-        <h1>Logo</h1>
+        <img
+          src="/LOGO_.png"
+          alt="Company Logo"
+          style={{ width: 100, marginBottom: 24 }}
+        />
       </Link>
 
       <div className="flex items-center gap-4">

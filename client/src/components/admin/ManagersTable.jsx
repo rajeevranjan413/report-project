@@ -9,7 +9,7 @@ import { MdOutlineDeleteOutline } from "react-icons/md";
 
 const { Search } = Input;
 
-const ManagersTable = ({ text,openModel, selected, set }) => {
+const ManagersTable = ({ text, openModel, selected, set }) => {
   const [workersData, setWorkersData] = useState([]);
   const [search, setSearch] = useState("");
   const limit = 10;
@@ -85,10 +85,10 @@ const ManagersTable = ({ text,openModel, selected, set }) => {
               dataIndex: "email",
               key: "email",
             },
-            {
-              title: `${text.factory}`,
-              render: (item) => <p>{item?.factory ?? "-"}</p>,
-            },
+            // {
+            //   title: `${text.factory}`,
+            //   render: (item) => <p>{item?.factory ?? "-"}</p>,
+            // },
             {
               title: `${text.action}`,
               render: (item) => (

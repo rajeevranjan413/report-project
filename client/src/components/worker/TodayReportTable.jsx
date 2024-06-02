@@ -15,7 +15,7 @@ import { FaUpload } from "react-icons/fa";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const TodayReportTable = ({ currentText }) => {
+const TodayReportTable = ({ refresh, currentText }) => {
   const [reports, setAllReports] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -39,7 +39,7 @@ const TodayReportTable = ({ currentText }) => {
 
   useEffect(() => {
     fetchReports();
-  }, []);
+  }, [refresh]);
 
   const handleEdit = async (record) => {
     try {

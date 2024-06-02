@@ -35,14 +35,15 @@ const translations = {
     somethingWentsWrong: "Something went wrong",
     copy: "Copy",
     userUpdated: "User Updated",
+    password: "Password",
   },
   lit: {
-    titleUsers: "Vartotojai", // Lithuanian translation for "Users"
-    createNewUser: "Sukurti naują vartotoją", // Lithuanian translation for "Create New User"
-    role: "Rolė", // Lithuanian translation for "Role"
-    factory: "Gamykla", // Lithuanian translation for "Factory"
-    name: "Vardas", // Lithuanian translation for "Name"
-    email: "El. paštas", // Lithuanian translation for "Email"
+    titleUsers: "Vartotojai",
+    createNewUser: "Sukurti naują vartotoją",
+    role: "Rolė",
+    factory: "Gamykla",
+    name: "Vardas",
+    email: "El. paštas",
     okText: "sukurti",
     title: "Naujas vartotojas",
     cancel: "Atšaukti",
@@ -58,6 +59,7 @@ const translations = {
     somethingWentsWrong: "kažkas nutiko",
     copy: "Kopijuoti",
     userUpdated: "Vartotojas atnaujintas",
+    password: "Slaptažodis",
   },
 };
 
@@ -71,20 +73,36 @@ const AdminUsers = () => {
     email: "",
     factory: "",
   });
+  const [formErrors, setFormErrors] = useState({});
   const [isPasswordModelOpen, setIsPasswordModelOpen] = useState(false);
   const [newUser, setNewUser] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userForEdit, setUserForEdit] = useState(null);
   const [editModelOpen, setEditModelOpen] = useState(false);
-  const { userAuth } = useSelector((store) => store?.system); // Access language from Redux
-  const admin = userAuth.role == "Admin" ? true : false;
-  const currentLang = userAuth?.language || "eng"; // Default to English if no language set
+  const { userAuth } = useSelector((store) => store?.system);
+  const admin = userAuth.role === "Admin";
+  const currentLang = userAuth?.language || "eng";
   const text = translations[currentLang];
+
   const showModal = () => {
     setIsModalOpen(true);
   };
 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.name) errors.name = "Name is required";
+    if (!formData.email) errors.email = "Email is required";
+    if (!formData.role) errors.role = "Role is required";
+    if (formData.role === "Worker" && !formData.factory) {
+      errors.factory = "Factory is required for Worker role";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleOk = async () => {
+    if (!validateForm()) return;
+
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/user/createUser",
@@ -139,7 +157,7 @@ const AdminUsers = () => {
   };
 
   const handleRoleChange = (value) => {
-    setFormData((prevData) => ({ ...prevData, role: value }));
+    setFormData((prevData) => ({ ...prevData, role: value, factory: "" }));
   };
 
   const handleFactoryChange = (value) => {
@@ -193,15 +211,13 @@ const AdminUsers = () => {
       <ToastContainer />
       {admin && (
         <div className="flex justify-between p-4 mt-4 mb-6">
-          <h1 className="text-xl font-bold">{text.titleUsers}</h1>{" "}
-          {/* Use translated title */}
+          <h1 className="text-xl font-bold">{text.titleUsers}</h1>
           <Button
             style={{ display: "flex", alignItems: "center", gap: "4px" }}
             type="primary"
             onClick={showModal}
           >
-            <IoIosAddCircle /> {text.createNewUser}{" "}
-            {/* Use translated button text */}
+            <IoIosAddCircle /> {text.createNewUser}
           </Button>
         </div>
       )}
@@ -261,21 +277,29 @@ const AdminUsers = () => {
                 { value: "Manager", label: "Manager" },
               ]}
             />
+            {formErrors.role && (
+              <span className="text-red-500">{formErrors.role}</span>
+            )}
           </div>
-          <div className="flex flex-col gap-1">
-            <label htmlFor="factory">{text.factory}</label>
-            <Select
-              value={formData.factory}
-              style={{ width: 120 }}
-              onChange={handleFactoryChange}
-            >
-              {factoryData.map((v, i) => (
-                <Select.Option key={i} value={v._id}>
-                  {v.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
+          {formData.role === "Worker" && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="factory">{text.factory}</label>
+              <Select
+                value={formData.factory}
+                style={{ width: 120 }}
+                onChange={handleFactoryChange}
+              >
+                {factoryData.map((v, i) => (
+                  <Select.Option key={i} value={v._id}>
+                    {v.name}
+                  </Select.Option>
+                ))}
+              </Select>
+              {formErrors.factory && (
+                <span className="text-red-500">{formErrors.factory}</span>
+              )}
+            </div>
+          )}
           <div className="flex flex-col gap-1">
             <label htmlFor="name">{text.name}</label>
             <Input
@@ -285,6 +309,9 @@ const AdminUsers = () => {
               value={formData.name}
               onChange={handleInputChange}
             />
+            {formErrors.name && (
+              <span className="text-red-500">{formErrors.name}</span>
+            )}
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="email">{text.email}</label>
@@ -295,6 +322,9 @@ const AdminUsers = () => {
               value={formData.email}
               onChange={handleInputChange}
             />
+            {formErrors.email && (
+              <span className="text-red-500">{formErrors.email}</span>
+            )}
           </div>
         </div>
       </Modal>
@@ -302,7 +332,7 @@ const AdminUsers = () => {
       <Modal
         title={`${text.password}`}
         open={isPasswordModelOpen}
-        onOk={handleCopyText} // Use handleCopyText for OK button click
+        onOk={handleCopyText}
         onCancel={handlePasswordModel}
         footer={[
           <Button

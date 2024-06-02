@@ -3,27 +3,26 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUserAuth } from "../../redux/slices/systemSlices";
+import { Form, Input, Button, Typography, Layout, message, Space } from "antd";
+
+const { Title, Text } = Typography;
+const { Content } = Layout;
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
+  const handleLogin = async (values) => {
+    setLoading(true);
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/user/login",
-        {
-          name,
-          password,
-        },
+        values,
         { withCredentials: true }
       );
 
-      if (data?.data) {
+      if (data?.success) {
         localStorage.setItem("userInfo", JSON.stringify(data.data));
         dispatch(setUserAuth(data.data));
 
@@ -47,55 +46,73 @@ const Login = () => {
               navigate("/");
           }
         }
+      } else {
+        message.error("Invalid email or password.");
       }
     } catch (error) {
+      message.error("Login failed. Please check your credentials.");
       console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mt-3 sm:mt-4 md:mt-5 h-screen">
-      <div className="bg-white w-full px-8 py-16 mx-auto max-w-[480px] h-full rounded-lg">
-        <h1 className="mb-8 text-center text-lg font-bold border-b border-black pb-4">
-          Welcome!
-        </h1>
-        <form onSubmit={handleLogin} className="grid gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="font-semibold text-sm" htmlFor="name">
-              Name
-            </label>
-            <input
-              onChange={(ev) => setName(ev.target.value)}
-              value={name}
-              className="px-1 py-3 outline-none border border-[#b9bec4] rounded text-sm"
-              id="name"
-              type="text"
-              name="name"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="font-semibold text-sm" htmlFor="password">
-              Password
-            </label>
-            <input
-              onChange={(ev) => setPassword(ev.target.value)}
-              value={password}
-              className="px-1 py-3 outline-none border border-[#b9bec4] rounded text-sm"
-              id="password"
-              type="password"
-              name="password"
-              required
-            />
-          </div>
-          <div className="flex flex-col mt-8">
-            <button className="py-3 bg-black text-white font-bold rounded">
+    <Layout
+      style={{
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Content
+        style={{
+          maxWidth: 480,
+          width: "100%",
+          padding: 24,
+          background: "#fff",
+          borderRadius: 8,
+        }}
+      >
+        <Space
+          direction="vertical"
+          style={{ width: "100%", textAlign: "center" }}
+        >
+          <img
+            src="/LOGO_.png"
+            alt="Company Logo"
+            style={{ width: 100, marginBottom: 24 }}
+          />
+          {/* <Title level={2} style={{ marginBottom: 16 }}>
+            Welcome!
+          </Title> */}
+          <Text type="secondary" style={{ marginBottom: 24 }}>
+            Please login to your account
+          </Text>
+        </Space>
+        <Form name="login" layout="vertical" onFinish={handleLogin}>
+          <Form.Item
+            label="Email"
+            name="name"
+            rules={[{ required: true, message: "Please input your email!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block loading={loading}>
               Login
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            </Button>
+          </Form.Item>
+        </Form>
+      </Content>
+    </Layout>
   );
 };
 

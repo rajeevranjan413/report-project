@@ -85,10 +85,10 @@ const ClientsTable = ({ text, openModel, selected, set, admin }) => {
               dataIndex: "email",
               key: "email",
             },
-            {
-              title: `${text.factory}`,
-              render: (item) => <p>{item?.factory ?? "-"}</p>,
-            },
+            // {
+            //   title: `${text.factory}`,
+            //   render: (item) => <p>{item?.factory ?? "-"}</p>,
+            // },
             admin == true
               ? {
                   title: `${text.action}`,

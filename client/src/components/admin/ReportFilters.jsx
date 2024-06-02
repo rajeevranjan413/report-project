@@ -1,13 +1,13 @@
 import { Select, Space } from "antd";
-import DatePickers from "./DatePicker";
+import DatePickers from "./DatePickers";
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export default function ReportFilters({ t,setFilter }) {
+export default function ReportFilters({ t, setFilter }) {
   const [factoryData, setFactoryData] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState(null);
-  const [selectedTopic, setSelectedTopic] = useState(null); // State for selected topic
+  const [selectedTopic, setSelectedTopic] = useState(null);
   const [dates, setDates] = useState(null);
 
   const onChange = (date, dateString) => {
@@ -37,12 +37,12 @@ export default function ReportFilters({ t,setFilter }) {
     setFilter((prev) => ({
       ...prev,
       factory: selectedFactory,
-      topic: selectedTopic, // Adding topic to the filter
+      topic: selectedTopic,
     }));
   }, [selectedFactory, selectedTopic, setFilter]);
 
   return (
-    <div className="flex gap-4 items-center w-full">
+    <div className="flex flex-wrap gap-4 items-center w-full">
       <div>
         <Space wrap>
           <Select
@@ -51,7 +51,7 @@ export default function ReportFilters({ t,setFilter }) {
             onChange={(value) => setSelectedFactory(value)}
             placeholder={t.sf}
           >
-            <Select.Option value={""}>{t.af}</Select.Option>
+            <Select.Option value="">{t.af}</Select.Option>
             {factoryData.map((factory) => (
               <Select.Option key={factory._id} value={factory._id}>
                 {factory.name}
@@ -73,14 +73,11 @@ export default function ReportFilters({ t,setFilter }) {
             onChange={(value) => setSelectedTopic(value)}
             placeholder={t.topic}
           >
-            {" "}
-            <Select.Option value={""}>{t.at}</Select.Option>
-            {/* Assuming topics are hardcoded or fetched similarly to factories */}
-            <Select.Option value={"Before Work"}>Before Work</Select.Option>
-            <Select.Option value={"After Work"}>After Work</Select.Option>
-            <Select.Option value={"With Chemical"}>With Chemical</Select.Option>
-            <Select.Option value={"Complain"}>Complain</Select.Option>
-            {/* Add more topics as needed */}
+            <Select.Option value="">{t.at}</Select.Option>
+            <Select.Option value="Before Work">Before Work</Select.Option>
+            <Select.Option value="After Work">After Work</Select.Option>
+            <Select.Option value="With Chemical">With Chemical</Select.Option>
+            <Select.Option value="Complain">Complain</Select.Option>
           </Select>
         </Space>
       </div>

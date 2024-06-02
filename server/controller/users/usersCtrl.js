@@ -24,9 +24,7 @@ function generatePassword() {
 const createUserCtrl = expressAsyncHandler(async (req, res) => {
   const { name, email, factory, role } = req.body;
   const password = generatePassword();
-  if (
-    [name, email, factory, password, role].some((field) => field?.trim() === "")
-  ) {
+  if ([name, email, password, role].some((field) => field?.trim() === "")) {
     return res.json({
       message: `All fields are require`,
     });
@@ -43,13 +41,16 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
   }
 
   try {
-    const user = await User.create({
+    const data = {
       name: name,
-      factory: new mongoose.Types.ObjectId(factory),
       email: email,
       password: password,
       role: role,
-    });
+    };
+    if (role == "Worker") {
+      data.factory = new mongoose.Types.ObjectId(factory);
+    }
+    const user = await User.create(data);
 
     const createdUser = await User.findById(user._id).select(
       "-password -accessToken"
@@ -67,6 +68,7 @@ const createUserCtrl = expressAsyncHandler(async (req, res) => {
       password: password,
     });
   } catch (err) {
+    console.log(err);
     return res.json({
       message: "Something went wrong while adding the user",
       data: err,
@@ -82,19 +84,22 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
   const { name, password } = req.body;
 
   if (!name && !password) {
-    return res.json({ message: "username or email is required" });
+    return res.json({
+      success: false,
+      message: "username or email is required",
+    });
   }
   //check if user exists
-  const userFound = await User.findOne({ name });
+  const userFound = await User.findOne({ email: name });
 
   if (!userFound) {
-    return res.json({ message: "user not found" });
+    return res.json({ success: false, message: "user not found" });
   }
 
   const isPasswordValid = await userFound.isPasswordMatched(password);
 
   if (!isPasswordValid) {
-    return res.json({ message: "Invalid Credentials" });
+    return res.json({ success: false, message: "Invalid Credentials" });
   }
 
   const accessToken = await userFound.generateAccessToken();
@@ -129,7 +134,7 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 
   res
     .cookie("accessToken", accessToken, options)
-    .json({ message: "User logedIn !", data: loggedInUser });
+    .json({ success: true, message: "User logedIn !", data: loggedInUser });
 });
 
 //-------------------------------
@@ -246,23 +251,23 @@ const getManagerList = expressAsyncHandler(async (req, res) => {
           role: "Manager",
         },
       },
-      {
-        $lookup: {
-          from: "factories", // The name of the factory collection
-          localField: "factory", // The field in the User collection
-          foreignField: "_id", // The field in the Factory collection
-          as: "factoryDetails",
-        },
-      },
-      {
-        $unwind: "$factoryDetails",
-      },
+      // {
+      //   $lookup: {
+      //     from: "factories", // The name of the factory collection
+      //     localField: "factory", // The field in the User collection
+      //     foreignField: "_id", // The field in the Factory collection
+      //     as: "factoryDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: "$factoryDetails",
+      // },
       {
         $match: {
           $or: [
             { name: { $regex: regexSearch } },
             { email: { $regex: regexSearch } },
-            { "factoryDetails.name": { $regex: regexSearch } },
+            // { "factoryDetails.name": { $regex: regexSearch } },
           ],
         },
       },
@@ -270,7 +275,7 @@ const getManagerList = expressAsyncHandler(async (req, res) => {
         $project: {
           name: 1,
           email: 1,
-          factory: "$factoryDetails.name",
+          // factory: "$factoryDetails.name",
         },
       },
     ]);
@@ -318,23 +323,23 @@ const getClientList = expressAsyncHandler(async (req, res) => {
           role: "User",
         },
       },
-      {
-        $lookup: {
-          from: "factories", // The name of the factory collection
-          localField: "factory", // The field in the User collection
-          foreignField: "_id", // The field in the Factory collection
-          as: "factoryDetails",
-        },
-      },
-      {
-        $unwind: "$factoryDetails",
-      },
+      // {
+      //   $lookup: {
+      //     from: "factories", // The name of the factory collection
+      //     localField: "factory", // The field in the User collection
+      //     foreignField: "_id", // The field in the Factory collection
+      //     as: "factoryDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: "$factoryDetails",
+      // },
       {
         $match: {
           $or: [
             { name: { $regex: regexSearch } },
             { email: { $regex: regexSearch } },
-            { "factoryDetails.name": { $regex: regexSearch } },
+            //   { "factoryDetails.name": { $regex: regexSearch } },
           ],
         },
       },
@@ -342,7 +347,7 @@ const getClientList = expressAsyncHandler(async (req, res) => {
         $project: {
           name: 1,
           email: 1,
-          factory: "$factoryDetails.name",
+          //   factory: "$factoryDetails.name",
         },
       },
     ]);
@@ -390,23 +395,23 @@ const getAdminList = expressAsyncHandler(async (req, res) => {
           role: "Admin",
         },
       },
-      {
-        $lookup: {
-          from: "factories", // The name of the factory collection
-          localField: "factory", // The field in the User collection
-          foreignField: "_id", // The field in the Factory collection
-          as: "factoryDetails",
-        },
-      },
-      {
-        $unwind: "$factoryDetails",
-      },
+      // {
+      //   $lookup: {
+      //     from: "factories", // The name of the factory collection
+      //     localField: "factory", // The field in the User collection
+      //     foreignField: "_id", // The field in the Factory collection
+      //     as: "factoryDetails",
+      //   },
+      // },
+      // {
+      //   $unwind: "$factoryDetails",
+      // },
       {
         $match: {
           $or: [
             { name: { $regex: regexSearch } },
             { email: { $regex: regexSearch } },
-            { "factoryDetails.name": { $regex: regexSearch } },
+            //   { "factoryDetails.name": { $regex: regexSearch } },
           ],
         },
       },
@@ -414,7 +419,7 @@ const getAdminList = expressAsyncHandler(async (req, res) => {
         $project: {
           name: 1,
           email: 1,
-          factory: "$factoryDetails.name",
+          // factory: "$factoryDetails.name",
         },
       },
     ]);
