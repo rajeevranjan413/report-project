@@ -85,7 +85,7 @@ const individualReportCtrl = expressAsyncHandler(async (req, res) => {
     return res.json({
       success: true,
       message: `Report Fetch Successfully`,
-      data: deletedReport,
+      report: deletedReport,
     });
   } catch (error) {
     return res.json({
@@ -146,6 +146,39 @@ const updateReportCtrl = expressAsyncHandler(async (req, res) => {
       message: "Something went wrong while updating the report",
       error: err,
     });
+  }
+});
+
+//------------------------------
+//  Update Report Image
+//------------------------------
+
+const uploadImages = expressAsyncHandler(async (req, res) => {
+  console.log("hello");
+  try {
+    const reportId = req.params.id;
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    const files = req.files;
+    const photosUrls = [];
+
+    for (const file of files) {
+      const { path } = file;
+      const url = await cloudinaryUploadImg(path);
+      photosUrls.push(url.url);
+    }
+
+    report.photo.push(...photosUrls);
+    await report.save();
+
+    res.status(200).json({ message: "Images uploaded successfully", report });
+  } catch (error) {
+    console.error("Failed to upload images", error);
+    res.status(500).json({ message: "Failed to upload images", error });
   }
 });
 
@@ -406,6 +439,27 @@ const downloadReport = expressAsyncHandler(async (req, res) => {
   }
 });
 
+const deleteImage = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { imageIndex } = req.body;
+
+  const report = await Report.findById(id);
+  if (!report) {
+    res.status(404);
+    throw new Error("Report not found");
+  }
+
+  if (imageIndex < 0 || imageIndex >= report.photo.length) {
+    res.status(400);
+    throw new Error("Invalid image index");
+  }
+
+  report.photo.splice(imageIndex, 1);
+  await report.save();
+
+  res.status(200).json({ message: "Image deleted successfully", report });
+});
+
 module.exports = {
   addReportCtrl,
   deleteReportCtrl,
@@ -414,4 +468,6 @@ module.exports = {
   getReportListForAdminCtrl,
   downloadReport,
   individualReportCtrl,
+  uploadImages,
+  deleteImage,
 };

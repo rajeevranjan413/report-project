@@ -77,7 +77,7 @@ const AdminUsers = () => {
   const [userForEdit, setUserForEdit] = useState(null);
   const [editModelOpen, setEditModelOpen] = useState(false);
   const { userAuth } = useSelector((store) => store?.system); // Access language from Redux
-  const admin = userAuth.role == "Admin" ? true : false;
+
   const currentLang = userAuth?.language || "eng"; // Default to English if no language set
   const text = translations[currentLang];
   const showModal = () => {
@@ -191,51 +191,43 @@ const AdminUsers = () => {
   return (
     <div>
       <ToastContainer />
-      {admin && (
-        <div className="flex justify-between p-4 mt-4 mb-6">
-          <h1 className="text-xl font-bold">{text.titleUsers}</h1>{" "}
-          {/* Use translated title */}
-          <Button
-            style={{ display: "flex", alignItems: "center", gap: "4px" }}
-            type="primary"
-            onClick={showModal}
-          >
-            <IoIosAddCircle /> {text.createNewUser}{" "}
-            {/* Use translated button text */}
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-between p-4 mt-4 mb-6">
+        <h1 className="text-xl font-bold">{text.titleUsers}</h1>{" "}
+        {/* Use translated title */}
+        <Button
+          style={{ display: "flex", alignItems: "center", gap: "4px" }}
+          type="primary"
+          onClick={showModal}
+        >
+          <IoIosAddCircle /> {text.createNewUser}{" "}
+          {/* Use translated button text */}
+        </Button>
+      </div>
       <div className="mb-2">
         <WorkersTable
-          admin={admin}
           text={text}
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
         />
-        {admin && (
-          <ManagersTable
-            text={text}
-            selected={setUserId}
-            set={change}
-            openModel={setEditModelOpen}
-          />
-        )}
+        <ManagersTable
+          text={text}
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
         <ClientsTable
-          admin={admin}
           text={text}
           selected={setUserId}
           set={change}
           openModel={setEditModelOpen}
         />
-        {admin && (
-          <AdminTable
-            text={text}
-            selected={setUserId}
-            set={change}
-            openModel={setEditModelOpen}
-          />
-        )}
+        <AdminTable
+          text={text}
+          selected={setUserId}
+          set={change}
+          openModel={setEditModelOpen}
+        />
       </div>
 
       <Modal

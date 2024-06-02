@@ -7,6 +7,8 @@ const {
   getReportListForAdminCtrl,
   downloadReport,
   individualReportCtrl,
+  uploadImages,
+  deleteImage,
 } = require("../../controller/reports/reportsCtrl");
 const authMiddleware = require("../../middleware/authMiddleware");
 const { photoUpload } = require("../../middleware/photoUpload");
@@ -30,5 +32,10 @@ reportRoutes.put("/updateReport/:id", authMiddleware, updateReportCtrl);
 reportRoutes.get("/todayReport", authMiddleware, getTodaysReportsCtrl);
 reportRoutes.get("/allReport", authMiddleware, getReportListForAdminCtrl);
 reportRoutes.get("/generate-pdf", downloadReport);
-
+reportRoutes.post(
+  "/uploadImages/:id",
+  photoUpload.array("photos", 10),
+  uploadImages
+);
+reportRoutes.delete("/deleteImage/:id", deleteImage);
 module.exports = reportRoutes;

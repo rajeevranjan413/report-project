@@ -9,7 +9,7 @@ import { FaRegEdit } from "react-icons/fa";
 
 const { Search } = Input;
 
-const WorkersTable = ({ text,selected, openModel, set }) => {
+const WorkersTable = ({ text, selected, openModel, set, admin }) => {
   const [workersData, setWorkersData] = useState([]);
   const [search, setSearch] = useState("");
   const [offset, setOffset] = useState(0);
@@ -86,24 +86,26 @@ const WorkersTable = ({ text,selected, openModel, set }) => {
               title: `${text.factory}`,
               render: (item) => <p>{item?.factory ?? "-"}</p>,
             },
-            {
-              title: `${text.action}`,
-              render: (item) => (
-                <div>
-                  <button
-                    onClick={() => {
-                      openModel(true);
-                      selected(item._id);
-                    }}
-                  >
-                    <FaRegEdit />
-                  </button>{" "}
-                  <button onClick={() => handleDelete(item._id)}>
-                    <MdOutlineDeleteOutline />
-                  </button>
-                </div>
-              ),
-            },
+            admin == true
+              ? {
+                  title: `${text.action}`,
+                  render: (item) => (
+                    <div>
+                      <button
+                        onClick={() => {
+                          openModel(true);
+                          selected(item._id);
+                        }}
+                      >
+                        <FaRegEdit />
+                      </button>{" "}
+                      <button onClick={() => handleDelete(item._id)}>
+                        <MdOutlineDeleteOutline />
+                      </button>
+                    </div>
+                  ),
+                }
+              : {},
           ]}
           data={workersData}
           pageSize={3}

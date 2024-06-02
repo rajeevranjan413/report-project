@@ -34,8 +34,8 @@ const translations = {
   },
 };
 
-const Header = () => {
-  const [language, setLanguage] = useState("eng");
+const Header = ({ lang }) => {
+  const [language, setLanguage] = useState(lang);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogout = async () => {
@@ -65,7 +65,6 @@ const Header = () => {
             ? currentText.switchToLithuanian
             : currentText.switchToEnglish}
         </Button>
-        <Avatar icon={<AntDesignOutlined />} />
         <Button
           onClick={handleLogout}
           style={{

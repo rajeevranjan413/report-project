@@ -1,22 +1,136 @@
-import { useState, useEffect } from "react";
 import {
-  Space,
-  Table,
   Button,
   ConfigProvider,
-  Upload,
   Modal,
+  Space,
+  Table,
+  Upload,
   message,
+  Image,
+  Popconfirm,
 } from "antd";
-import axios from "axios";
+import EditReportCard from "./EditReportCard";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { FaRegEdit, FaUpload } from "react-icons/fa";
+import { FaUpload } from "react-icons/fa";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const TodayReportTable = ({ currentText }) => {
   const [reports, setAllReports] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+
+  const fetchReports = async () => {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:8000/api/report/todayReport",
+        {
+          withCredentials: true,
+        }
+      );
+      setAllReports(data.data);
+    } catch (error) {
+      console.error("Failed to fetch reports", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const handleEdit = async (record) => {
+    try {
+      const { data } = await axios.get(
+        `http://localhost:8000/api/report/individual-report/${record._id}`,
+        { withCredentials: true }
+      );
+      setSelectedReport(data.report);
+      setEditModalVisible(true);
+    } catch (error) {
+      console.error("Failed to fetch report for editing", error);
+    }
+  };
+
+  const handleDelete = async (record) => {
+    try {
+      await axios.delete(
+        `http://localhost:8000/api/report/deleteReport/${record._id}`,
+        { withCredentials: true }
+      );
+      message.success("Report deleted successfully");
+      fetchReports();
+    } catch (error) {
+      console.error("Failed to delete report", error);
+      message.error("Failed to delete report");
+    }
+  };
+
+  const handleViewImage = (photos, record) => {
+    setSelectedImages(photos || []);
+    setSelectedReport(record);
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setSelectedImages([]);
+  };
+
+  const handleDeleteImage = async (index) => {
+    try {
+      const { data } = await axios.delete(
+        `http://localhost:8000/api/report/deleteImage/${selectedReport._id}`,
+        {
+          data: { imageIndex: index },
+          withCredentials: true,
+        }
+      );
+
+      setSelectedReport(data.report);
+      setSelectedImages(data.report.photo);
+      message.success("Image deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete image", error);
+      message.error("Failed to delete image");
+    }
+  };
+
+  const handleUploadImage = async ({ file }) => {
+    if (!selectedReport) {
+      message.error("No report selected");
+      return;
+    }
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("photos", file);
+
+    try {
+      const { data } = await axios.post(
+        `http://localhost:8000/api/report/uploadImages/${selectedReport._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setSelectedReport(data.report);
+      setSelectedImages(data.report.photo);
+      setUploading(false);
+      message.success(`${file.name} file uploaded successfully.`);
+    } catch (error) {
+      console.error("Failed to upload image", error);
+      setUploading(false);
+      message.error(`${file.name} file upload failed.`);
+    }
+  };
 
   const columns = [
     {
@@ -63,72 +177,29 @@ const TodayReportTable = ({ currentText }) => {
       title: `${currentText?.photos}`,
       dataIndex: "photo",
       key: "photo",
-      render: (_, { photo }) => (
-        <Button onClick={() => handleViewImage(photo)}>View Image</Button>
+      render: (_, record) => (
+        <Button onClick={() => handleViewImage(record.photo, record)}>
+          View Image
+        </Button>
       ),
     },
     {
       title: `${currentText?.action}`,
       key: "action",
       render: (_, record) => (
-        <Space size="middle">
-          <a onClick={() => handleEdit(record)}>
-            <FaRegEdit />
-          </a>
-          <a onClick={() => handleDelete(record)}>
-            <MdOutlineDeleteOutline />
-          </a>
-        </Space>
+        <Popconfirm
+          title="Are you sure you want to delete this report?"
+          onConfirm={() => handleDelete(record)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button type="danger" icon={<MdOutlineDeleteOutline />}>
+            Delete
+          </Button>
+        </Popconfirm>
       ),
     },
   ];
-
-  useEffect(() => {
-    const getResponse = async () => {
-      try {
-        const { data } = await axios.get(
-          "http://localhost:8000/api/report/todayReport",
-          { withCredentials: true }
-        );
-        setAllReports(data.data);
-        console.log(data);
-      } catch (error) {
-        console.error("Failed to fetch reports", error);
-      }
-    };
-
-    getResponse();
-  }, []);
-
-  const handleViewImage = (photos) => {
-    setSelectedImages(photos || []);
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setSelectedImages([]);
-  };
-
-  const handleDeleteImage = (index) => {
-    const updatedImages = [...selectedImages];
-    updatedImages.splice(index, 1);
-    setSelectedImages(updatedImages);
-  };
-
-  const handleUploadImage = async (info) => {
-    if (info.file.status === "uploading") {
-      setUploading(true);
-      return;
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully.`);
-      setUploading(false);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-      setUploading(false);
-    }
-  };
 
   return (
     <>
@@ -141,10 +212,16 @@ const TodayReportTable = ({ currentText }) => {
           },
         }}
       >
-        <Table columns={columns} dataSource={reports} rowKey="id" />
+        <Table
+          columns={columns}
+          dataSource={reports}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+          scroll={{ x: 800 }}
+        />
       </ConfigProvider>
       <Modal
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         centered
@@ -160,8 +237,8 @@ const TodayReportTable = ({ currentText }) => {
           <Upload
             accept="image/*"
             showUploadList={false}
-            beforeUpload={() => false}
-            onChange={handleUploadImage}
+            beforeUpload={() => true}
+            customRequest={handleUploadImage}
           >
             <Button icon={<FaUpload />} loading={uploading}>
               Upload Image
@@ -178,17 +255,25 @@ const TodayReportTable = ({ currentText }) => {
           {selectedImages.length > 0 ? (
             selectedImages.map((image, index) => (
               <div key={index} style={{ margin: "10px", position: "relative" }}>
-                <img
+                <Image
                   src={image}
                   alt={`Report Image ${index}`}
                   style={{ width: "70px", height: "70px" }}
-                />
-                <Button
-                  type="danger"
-                  icon={<MdOutlineDeleteOutline />}
-                  size="small"
-                  style={{ position: "absolute", top: "-10px", right: "-10px" }}
-                  onClick={() => handleDeleteImage(index)}
+                  preview={{
+                    src: image,
+                    mask: (
+                      <Popconfirm
+                        title="Are you sure you want to delete this image?"
+                        onConfirm={() => handleDeleteImage(index)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <MdOutlineDeleteOutline
+                          style={{ color: "red", fontSize: "20px" }}
+                        />
+                      </Popconfirm>
+                    ),
+                  }}
                 />
               </div>
             ))
@@ -196,6 +281,22 @@ const TodayReportTable = ({ currentText }) => {
             <p>No images to display</p>
           )}
         </div>
+      </Modal>
+      <Modal
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        footer={null}
+        centered
+        width={800}
+      >
+        {selectedReport && (
+          <EditReportCard
+            report={selectedReport}
+            area={reports.map((report) => report.area)}
+            setVisible={setEditModalVisible}
+            fetchReports={fetchReports}
+          />
+        )}
       </Modal>
     </>
   );

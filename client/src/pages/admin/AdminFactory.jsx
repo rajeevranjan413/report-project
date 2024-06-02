@@ -22,8 +22,8 @@ const translations = {
     edit: "Edit",
     delete: "Delete",
     create: "Create",
-    addArea:"Add Area"
-    },
+    addArea: "Add Area",
+  },
   lit: {
     factories: "Gamyklos", // Lithuanian translation for Factories
     createNewFactory: "Sukurti naują fabriką", // Lithuanian translation for Create New Factory
@@ -34,7 +34,7 @@ const translations = {
     edit: "Redaguoti", // Lithuanian translation for Edit
     delete: "Ištrinti", // Lithuanian translation for Delete
     create: "Sukurti", // Lithuanian translation for Create
-    addArea:"Pridėti sritį"
+    addArea: "Pridėti sritį",
   },
 };
 
@@ -52,6 +52,7 @@ const AdminFactory = () => {
   const [editModelOpen, setEditModelOpen] = useState(null);
   const [factoryId, setFactoryId] = useState(null);
   const { userAuth } = useSelector((store) => store?.system);
+  const admin = userAuth.role == "Admin" ? true : false;
   const currentText = translations[userAuth?.language || "eng"];
   useEffect(() => {
     async function getFactoryList(search, offset, limit) {
@@ -196,23 +197,26 @@ const AdminFactory = () => {
   return (
     <div>
             <ToastContainer />     {" "}
-      <div className="flex justify-between p-4 mt-4 mb-6">
-                <h1 className="text-xl font-bold">{currentText.factories}</h1>       {" "}
-        <Button
-          style={{ display: "flex", alignItems: "center", gap: "4px" }}
-          type="primary"
-          onClick={showModal}
-        >
-        <IoIosAddCircle />{currentText.createNewFactory}
-        </Button>
-             {" "}
-      </div>
+      {admin && (
+        <div className="flex justify-between p-4 mt-4 mb-6">
+                  <h1 className="text-xl font-bold">{currentText.factories}</h1>
+                 {" "}
+          <Button
+            style={{ display: "flex", alignItems: "center", gap: "4px" }}
+            type="primary"
+            onClick={showModal}
+          >
+            <IoIosAddCircle />
+            {currentText.createNewFactory}
+          </Button>
+               {" "}
+        </div>
+      )}
            {" "}
       <div className="mb-2">
                {" "}
         <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-                    <h5>{currentText.factories}</h5>
-                   {" "}
+                    <h5>{currentText.factories}</h5>         {" "}
           <Search
             placeholder={currentText.searchFactoryName}
             onSearch={onSearch}
@@ -235,25 +239,26 @@ const AdminFactory = () => {
               dataIndex: "areas",
               render: (item) => item.map((i, k) => <p key={k}>{i}</p>),
             },
-            {
-              title: currentText.action,
-              render: (item) => (
-                <div>
-                  <button
-                    onClick={() => {
-                      setEditModelOpen(true);
-                      setFactoryId(item._id);
-                    }}
-                  >
-                  <FaRegEdit />{" "}
-                  </button>{" "}
-                  <button onClick={() => handleDelete(item._id)}>
-                     <MdOutlineDeleteOutline />
-                  </button>
-                 {" "}
-                </div>
-              ),
-            },
+            admin == true
+              ? {
+                  title: currentText.action,
+                  render: (item) => (
+                    <div>
+                      <button
+                        onClick={() => {
+                          setEditModelOpen(true);
+                          setFactoryId(item._id);
+                        }}
+                      >
+                        <FaRegEdit />{" "}
+                      </button>{" "}
+                      <button onClick={() => handleDelete(item._id)}>
+                        <MdOutlineDeleteOutline />
+                      </button>{" "}
+                    </div>
+                  ),
+                }
+              : {},
           ]}
           data={factoryData || []}
           pageSize={10}
@@ -275,8 +280,8 @@ const AdminFactory = () => {
           <div className="mt-4 grid gap-2">
                        {" "}
             <div className="flex flex-col gap-1">
-                            <label htmlFor="name">{currentText.name}</label>
-                           {" "}
+                            <label htmlFor="name">{currentText.name}</label>   
+                       {" "}
               <input
                 className="p-2 border outline-none rounded"
                 type="text"
@@ -306,15 +311,16 @@ const AdminFactory = () => {
                   }
                 />
                                {" "}
-                <Button type="primary" onClick={() => handleRemoveInput(index)}>{currentText.delete}</Button>
+                <Button type="primary" onClick={() => handleRemoveInput(index)}>
+                  {currentText.delete}
+                </Button>
                              {" "}
               </Form.Item>
             ))}
-            
             <Form.Item>
                            {" "}
               <Button type="primary" onClick={handleAddInput}>
-              {currentText.addArea}
+                {currentText.addArea}
               </Button>
                          {" "}
             </Form.Item>
@@ -327,7 +333,7 @@ const AdminFactory = () => {
            {" "}
       {factoryForEdit && (
         <EditFactoryModal
-        currentText= {currentText}
+          currentText={currentText}
           isModalOpen={editModelOpen}
           handleOk={handleEditOk}
           handleCancel={handleCancel}

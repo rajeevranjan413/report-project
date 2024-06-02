@@ -6,6 +6,7 @@ const FactoryTable = ({ data, columns, pageSize }) => {
       dataSource={data}
       columns={columns}
       pagination={{ pageSize: pageSize }}
+      scroll={{ x: 800 }}
     />
   );
 };

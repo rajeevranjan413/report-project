@@ -137,16 +137,16 @@ const loginUserCtrl = expressAsyncHandler(async (req, res) => {
 //-------------------------------
 
 const checkLoggedCtrl = expressAsyncHandler(async (req, res) => {
-  const {id} = req.user;
+  const { id } = req.user;
   console.log("hello");
   try {
     const loggedInUser = await User.findById(id).select(
       "-password -accessToken"
     );
-    return res.json({success:true, message: "ok", data: loggedInUser });
+    return res.json({ success: true, message: "ok", data: loggedInUser });
   } catch (err) {
     console.log(err);
-    return res.json({success:false, message: "Invalid Credentials", err });
+    return res.json({ success: false, message: "Invalid Credentials", err });
   }
 });
 
@@ -485,20 +485,20 @@ const userDetailsCtrl = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
 //-------------------------------
 // Switch Language
 //-------------------------------
 
 const switchLanguageCtrl = expressAsyncHandler(async (req, res) => {
- 
-  const {id} = req.user
-  const {language} = req.body
-console.log("hello");
+  const { id } = req.user;
+  const { language } = req.body;
+  console.log("hello");
   try {
-    const user = await User.findByIdAndUpdate(id,{language},{new:true}).select(
-      "-password -accessToken"
-    );
+    const user = await User.findByIdAndUpdate(
+      id,
+      { language },
+      { new: true }
+    ).select("-password -accessToken");
     console.log(user);
     res.json({
       success: true,
@@ -509,7 +509,7 @@ console.log("hello");
     });
   } catch (error) {
     console.log(error);
-    return res.json({success:false, message: "Employee Fetch Fail", err });
+    return res.json({ success: false, message: "Employee Fetch Fail", err });
   }
 });
 const userEditCtrl = expressAsyncHandler(async (req, res) => {
@@ -573,18 +573,18 @@ const logoutUserCtrl = expressAsyncHandler(async (req, res) => {
     .json({ message: "User logged Out" });
 });
 
-const changePassword =  expressAsyncHandler(async(req,res)=>{
-  const {_id} = req.user
+const changePassword = expressAsyncHandler(async (req, res) => {
+  const { _id } = req.user;
   console.log(_id);
-  const {password} = req.body;
+  const { password } = req.body;
   if (!password) {
-    throw new Error("Both Password should be same!")
+    throw new Error("Both Password should be same!");
   }
   try {
     const user = await User.findById(_id);
     user.password = password;
     user.firstLogin = false;
-    await user.save()
+    await user.save();
     res.json({
       success: true,
       message: "Password Updated",
@@ -596,7 +596,7 @@ const changePassword =  expressAsyncHandler(async(req,res)=>{
       message: "Unable to Update Password",
     });
   }
-})
+});
 function getFormattedDate() {
   const now = moment();
   const hour = now.hour();
@@ -624,5 +624,5 @@ module.exports = {
   userDetailsCtrl,
   userEditCtrl,
   changePassword,
-  switchLanguageCtrl
+  switchLanguageCtrl,
 };

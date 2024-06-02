@@ -9,7 +9,7 @@ import { MdOutlineDeleteOutline } from "react-icons/md";
 
 const { Search } = Input;
 
-const AdminTable = ({ text,openModel, selected, set }) => {
+const AdminTable = ({ text, openModel, selected, set }) => {
   const [workersData, setWorkersData] = useState([]);
   const [search, setSearch] = useState("");
   const limit = 10;

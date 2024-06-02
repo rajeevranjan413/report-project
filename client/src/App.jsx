@@ -8,6 +8,7 @@ import {
   CheckFirstLoginRoute,
 } from "./routes/index";
 import ChangePassword from "./pages/ChangePassword";
+import ManagerRoute from "./routes/ManagerRoute";
 
 const Home = lazy(() => import("./pages/Home"));
 
@@ -56,11 +57,12 @@ const App = () => {
           <Route path="/admin/work-report" element={<AdminWorkReport />} />
         </Route>
         {/* ------------ Boss Routes ------------*/}{" "}
-        {/* 
-        <Route element={<AdminRoute />}>
-          <Route path='/boss/dashboard' element={<AdminDashboard role="boss" />} />
-          <Route path='/boss/reports' />
-        </Route> */}
+        <Route element={<ManagerRoute />}>
+          <Route path="/manager/users" element={<AdminUsers />} />
+          <Route path="/manager/reports" element={<AdminReports />} />
+          <Route path="/manager/factory" element={<AdminFactory />} />
+          <Route path="/manager/work-report" element={<AdminWorkReport />} />
+        </Route>
       </Routes>
     </Suspense>
   );

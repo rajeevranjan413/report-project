@@ -9,7 +9,7 @@ import { MdOutlineDeleteOutline } from "react-icons/md";
 
 const { Search } = Input;
 
-const ClientsTable = ({ text,openModel, selected, set }) => {
+const ClientsTable = ({ text, openModel, selected, set, admin }) => {
   const [workersData, setWorkersData] = useState([]);
   const [search, setSearch] = useState("");
   const limit = 10;
@@ -66,7 +66,7 @@ const ClientsTable = ({ text,openModel, selected, set }) => {
     <div>
       <div className="mb-2">
         <div className="h-16 flex justify-between items-center px-4 bg-white mb-1 font-bold">
-          <h5>{text.users}</h5>
+          <h5>{text.client}</h5>
           <Search
             placeholder={text.placeholder}
             onSearch={onSearch}
@@ -89,24 +89,26 @@ const ClientsTable = ({ text,openModel, selected, set }) => {
               title: `${text.factory}`,
               render: (item) => <p>{item?.factory ?? "-"}</p>,
             },
-            {
-              title: `${text.action}`,
-              render: (item) => (
-                <div>
-                  <button
-                    onClick={() => {
-                      openModel(true);
-                      selected(item._id);
-                    }}
-                  >
-                    <FaRegEdit />
-                  </button>{" "}
-                  <button onClick={() => handleDelete(item._id)}>
-                    <MdOutlineDeleteOutline />
-                  </button>
-                </div>
-              ),
-            },
+            admin == true
+              ? {
+                  title: `${text.action}`,
+                  render: (item) => (
+                    <div>
+                      <button
+                        onClick={() => {
+                          openModel(true);
+                          selected(item._id);
+                        }}
+                      >
+                        <FaRegEdit />
+                      </button>{" "}
+                      <button onClick={() => handleDelete(item._id)}>
+                        <MdOutlineDeleteOutline />
+                      </button>
+                    </div>
+                  ),
+                }
+              : {},
           ]}
           data={workersData}
           pageSize={3}
